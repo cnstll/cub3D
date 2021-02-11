@@ -1,6 +1,6 @@
 NAME = cub3D
 
-SRCS = mvp.c
+SRCS = raycasting.c
 
 OBJS = $(SRCS:.c=.o)
 
@@ -14,6 +14,8 @@ CC = gcc
 
 CFLAGS = -Wall -Wextra
 
+DEBUG = -g
+
 #LIB = -L./libft/ -lft
 
 all : $(NAME)
@@ -24,7 +26,10 @@ $(NAME) : $(OBJS)
 #		$(MAKE) -C ./libft
 #		cp libft/libft.a ./$(NAME)
 #		ar rcs $@ $^
-
+debug : 
+		$(CC) ${CFLAGS} ${DEBUG} -I ${HEADERS} -Imlx_osx  -o ${OBJS} -c ${SRCS} 
+		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_OSX)
+		
 %.o : %.c
 		$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_osx  -o $@ -c $<
 		#$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_linux -O3  -o $@ -c $<

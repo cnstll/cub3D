@@ -27,6 +27,13 @@ typedef struct	s_img_param {
 	int         endian;
 }				t_img_param;	
 
+typedef struct s_pos {
+
+	int			x;
+	int			y;
+
+};
+
 typedef struct  s_data {
 	void        *img;
 	char        *addr;
@@ -54,7 +61,7 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 void init_img(t_data *data)
 {
 
-	//data->img = mlx_new_image(data->mlx, data->x_screen, data->y_screen);
+	data->img = mlx_new_image(data->mlx, data->x_screen, data->y_screen);
 	//	data->img = mlx_xpm_file_to_image(data->mlx , "./pacman.xpm", &data->width, &data->height);
 	data->addr = mlx_get_data_addr(data->img, &data->bits_per_pixel, &data->line_length,
 				&data->endian);
@@ -67,44 +74,29 @@ int put_textured_img(t_data *data)
 	return (1);
 }
 
-int             key_hook(int keycode, t_data *data)
+int put_stripe(t_data *data, int x, int start, int end)
 {
-	if (keycode == 13 || keycode == 1 || keycode == 0 || keycode == 2)
-	{
-		mlx_destroy_image(data->mlx, data->img);
-		printf("img destroyed !\n");
-	}
-	if (keycode == 13)
-	{
-		data->y -= 10;
-		put_textured_img(data);
-		printf("You moved forward\n");
+	int i;
 
-	}
-	if (keycode == 1)
+	i = start;
+	while (i >= end)	
 	{
-		data->y += 10;
-		put_textured_img(data);
-		printf("You moved backward\n");
+		my_mlx_pixel_put(data, x, i, 0x00FF0000);
+		i--;
 	}
-	if (keycode == 0)
-	{
-		data->x -= 10;
-		put_textured_img(data);
-		printf("You moved left\n");
-	}
-	if (keycode == 2)
-	{
-		data->x += 10;
-		put_textured_img(data);
-		printf("You moved right\n");
-	}
+	mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);	
 }
 
 int main(void)
 {
 	t_data img;
+	int start;
+	int end;
+	int x;
 
+	start = 200;
+	end = 100;
+	x = 319;
 	img.x = 320;
 	img.y = 240;
 	img.x_screen = 640;
@@ -112,8 +104,12 @@ int main(void)
 	img.mlx = mlx_init();
 	img.win = mlx_new_window(img.mlx, img.x_screen, img.y_screen, "cub3D");
 	init_img(&img);
-	put_textured_img(&img);
-	mlx_key_hook(img.win, key_hook, &img);
+	//put_textured_img(&img);
+	//mlx_key_hook(img.win, key_hook, &img);
+//	my_mlx_pixel_put(&img, 320, start, 0x00FF0000);
+//	mlx_put_image_to_window(img.mlx, img.win, img.img, 0, 0);	
+	while (x++ < 400)
+		put_stripe(&img, x, start, end);
 	mlx_loop(img.mlx);
 }
 
