@@ -20,6 +20,7 @@
 #include "cube.h"
 #define WORLD_WD 24
 #define WORLD_HT 24
+#define	READ_SIZE 32
 
 typedef struct	s_img {
 	void        *img;
@@ -309,17 +310,6 @@ int            key_hook(int keycode, t_data *data)
 		printf("You moved right\n");
 	}
 	return (1);
-}
-
-int extract_map()
-{
-	int fd;
-
-	fd = 0;
-	fd = open("./map_test.cub", O_RDONLY);
-	read(fd, buf, read_size);
-
-	close(fd);
 }
 
 int main(void)
