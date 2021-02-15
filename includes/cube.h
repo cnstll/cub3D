@@ -6,3 +6,5 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <X11/keysym.h>
+#include <X11/X.h>
