@@ -44,7 +44,9 @@ typedef struct s_ray {
 	double		plane_y;
 	double		camera_x;
 	double		ray_dir_x;
-	double		ray_dir_y;
+	double		ray_dir_y; 
+	double		rs;
+	double		ms;
 }				t_ray;
 
 typedef struct  s_data {
@@ -59,10 +61,18 @@ typedef struct  s_data {
 
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
-	char    *dst;
+	unsigned char    *src;
+	unsigned char    r;
+	unsigned char    g;
+	unsigned char    b;
 
-	dst = data->img->addr + (y * data->img->line_length + x * (data->img->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
+	src = (unsigned char *)&color;	
+	r = src[0];
+	g = src[1];
+	b = src[2];
+	data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8] = r;
+	data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8 + 1] = g;
+	data->img->addr[y * data->img->line_length + x * data->img->bits_per_pixel / 8 + 2] = b;
 }
 
 int		init_window(t_data *data)
@@ -76,29 +86,25 @@ int		init_window(t_data *data)
 
 int		init_img(t_data *data)
 {
-	t_img *img;
-
-	img = malloc(sizeof(t_img));
-	img->time = 0; //time of current frame
-	img->old_time = 0; //time of previous fram
-	img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
-	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length, &img->endian);
-	data->img = img;
+	data->img = malloc(sizeof(t_img));
+	data->img->time = 0; //time of current frame
+	data->img->old_time = 0; //time of previous fram
+	data->img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
+	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bits_per_pixel, &data->img->line_length, &data->img->endian);
 	return (1);
 }
 
 int		init_ray(t_data *data)
 {
-	t_ray *ray;
-
-	ray = malloc(sizeof(t_ray));
-	ray->pos_x = 4;
-	ray->pos_y = 4;  //x and y start position
-	ray->dir_x = -1; 
-	ray->dir_y = 0; //initial direction vector
-	ray->plane_x = 0; 
-	ray->plane_y = 1; //the 2d raycaster version of camera plane
-	data->ray = ray;
+	data->ray = malloc(sizeof(t_ray));
+	data->ray->pos_x = 18;
+	data->ray->pos_y = 18;  //x and y start position
+	data->ray->ms = 0.5;
+	data->ray->rs = 0.1;
+	data->ray->dir_x = -1; 
+	data->ray->dir_y = 0; //initial direction vector
+	data->ray->plane_x = 0; 
+	data->ray->plane_y = 1; //the 2d raycaster version of camera plane
 	return (1);
 }
 
@@ -167,11 +173,10 @@ int put_stripes(t_data *data, int x, int start, int end, int color)
 		my_mlx_pixel_put(data, x, i, color);
 		i++;
 	}
-	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
 	return (1);
 }
 
-int render_next_frame(t_data *data)
+int cast_img(t_data *data)
 {
 	int stripes;
 	int max_stripes;
@@ -194,6 +199,7 @@ int render_next_frame(t_data *data)
 	int draw_end;
 	stripes = 0;
 	max_stripes = 640;
+	//printf("Before raycasting loop\n");
 	while (stripes < max_stripes)
 	{
 		data->ray->camera_x = 2 * stripes / (double)(max_stripes) - 1; //x-coordinate in camera space
@@ -205,10 +211,21 @@ int render_next_frame(t_data *data)
 		map_y = (int)(data->ray->pos_y);
 
 		//length of ray from one x or y-side to next x or y-side
-		delta_dist_x = fabs(1 / data->ray->ray_dir_x);
-		delta_dist_y = fabs(1 / data->ray->ray_dir_y);
+		if (data->ray->ray_dir_y == 0)	
+			delta_dist_x = 0;
+		else if (data->ray->ray_dir_x == 1)	
+			delta_dist_x = 1;
+		else	
+			delta_dist_x = fabs(1 / data->ray->ray_dir_x);
+		if (data->ray->ray_dir_x == 0)	
+			delta_dist_y = 0;
+		else if (data->ray->ray_dir_y == 1)	
+			delta_dist_y = 1;
+		else	
+			delta_dist_y = fabs(1 / data->ray->ray_dir_y);
 		//was there a wall hit?
 		hit = 0;
+		//printf("Looking for a wall\n");
 		if (data->ray->ray_dir_x < 0)
 		{
 			step_x = -1;
@@ -231,6 +248,7 @@ int render_next_frame(t_data *data)
 		}	
 
 		//perform DDA
+		//printf("Perform DDA\n");
 		while (hit == 0)
 		{
 			//jump to next map square, OR in x-direction, OR in y-direction
@@ -251,6 +269,7 @@ int render_next_frame(t_data *data)
 				hit = 1;
 		}
 		//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
+		//printf("Wall Dist\n");
 		if (side == 0)
 			wall_dist = (map_x - data->ray->pos_x + (1 - step_x) / 2) / data->ray->ray_dir_x;
 		else
@@ -279,51 +298,87 @@ int render_next_frame(t_data *data)
 		put_stripes(data, stripes, draw_start, draw_end, color);
 		stripes++;
 	}
+	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
+	printf("In render pos_x - %f\n",(data->ray->pos_x));	
+	printf("In render dir_x - %f\n",(data->ray->dir_x));	
+
 	return (1);
+}
+
+int				render_next_frame(t_data *data)
+{
+		mlx_destroy_image(data->mlx, data->img->img);
+		data->img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
+		cast_img(data);
+		return (1);
 }
 
 int            key_hook(int keycode, t_data *data)
 {
-	if (keycode == 13 || keycode == 1 || keycode == 0 || keycode == 2)
-	{
-		printf("img destroyed !\n");
-	}
 	if (keycode == 13)
 	{
-		if(data->world[(int)(data->ray->pos_x + data->ray->dir_x)][(int)(data->ray->pos_y)] == 0)
-			data->ray->pos_x += data->ray->dir_x;
-		if(data->world[(int)(data->ray->pos_x)][(int)(data->ray->pos_y + data->ray->dir_y)] == 0) 
-			data->ray->pos_y += data->ray->dir_y;
+		if(data->world[(int)(data->ray->pos_x + data->ray->dir_x * data->ray->ms)][(int)(data->ray->pos_y)] == 0)
+			data->ray->pos_x += data->ray->dir_x * data->ray->ms;
+		if(data->world[(int)(data->ray->pos_x)][(int)(data->ray->pos_y + data->ray->dir_y * data->ray->ms)] == 0) 
+			data->ray->pos_y += data->ray->dir_y * data->ray->ms;
 		render_next_frame(data);
 		printf("You moved forward\n");
 	}
 	if (keycode == 1)
 	{
+		if(data->world[(int)(data->ray->pos_x - data->ray->dir_x * data->ray->ms)][(int)(data->ray->pos_y)] == 0)
+			data->ray->pos_x -= data->ray->dir_x * data->ray->ms;
+		if(data->world[(int)(data->ray->pos_x)][(int)(data->ray->pos_y - data->ray->dir_y * data->ray->ms)] == 0) 
+			data->ray->pos_y -= data->ray->dir_y * data->ray->ms;
+		render_next_frame(data);
 		printf("You moved backward\n");
 	}
 	if (keycode == 0)
 	{
+		double oldDirX = data->ray->dir_x;
+		data->ray->dir_x = data->ray->dir_x * cos(data->ray->rs) - data->ray->dir_y * sin(data->ray->rs);
+		data->ray->dir_y = oldDirX * sin(data->ray->rs) + data->ray->dir_y * cos(data->ray->rs);
+		double oldPlaneX = data->ray->plane_x;
+		data->ray->plane_x = data->ray->plane_x * cos(data->ray->rs) - data->ray->plane_y * sin(data->ray->rs);
+		data->ray->plane_y = oldPlaneX * sin(data->ray->rs) + data->ray->plane_y * cos(data->ray->rs);
+		render_next_frame(data);
 		printf("You moved left\n");
 	}
 	if (keycode == 2)
 	{
+		double oldDirX = data->ray->dir_x;
+		data->ray->dir_x = data->ray->dir_x * cos(-data->ray->rs) - data->ray->dir_y * sin(-data->ray->rs);
+		data->ray->dir_y = oldDirX * sin(-data->ray->rs) + data->ray->dir_y * cos(-data->ray->rs);
+		double oldPlaneX = data->ray->plane_x;
+		data->ray->plane_x = data->ray->plane_x * cos(-data->ray->rs) - data->ray->plane_y * sin(-data->ray->rs);
+		data->ray->plane_y = oldPlaneX * sin(-data->ray->rs) + data->ray->plane_y * cos(-data->ray->rs);
+		render_next_frame(data);
 		printf("You moved right\n");
+	}
+	if (keycode == 123)
+	{
+		printf("You moved cam left\n");
+	}
+	if (keycode == 124)
+	{
+		//both camera direction and camera plane must be rotated
+		printf("You moved cam right\n");
 	}
 	return (1);
 }
 
 int main(void)
 {
-	int  world[WORLD_WD][WORLD_WD] = {	
-		{1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-		{1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	int  world[WORLD_WD][WORLD_HT] = {	
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+		{1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -345,9 +400,9 @@ int main(void)
 	init_window(data);
 	init_array(world, data->world);
 	//print_array(data->world);
-	init_ray(data);
 	init_img(data);
+	init_ray(data);
 	render_next_frame(data);
-	mlx_key_hook(data->win, key_hook, &data);	
+	mlx_key_hook(data->win, key_hook, data);	
 	mlx_loop(data->mlx);
 }
