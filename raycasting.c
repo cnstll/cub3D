@@ -75,7 +75,7 @@ void            my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	img->addr[y * img->line_len + x * img->bpp / 8 + 2] = b;
 }
 
-int		any_directionnal_key(int keysim)
+/*int		any_directionnal_key(int keysim)
 {
 	char	**directionnal_key;
 	int		i;
@@ -84,7 +84,7 @@ int		any_directionnal_key(int keysim)
 	directionnal_key[1][] = "XK_s";
 	directionnal_key[2][] = "XK_a";
 	directionnal_key[3][] = "XK_d";
-}
+}*/
 
 int		init_window(t_data *data)
 {
@@ -118,12 +118,12 @@ int		init_ray(t_data *data)
 	data->ray = malloc(sizeof(t_ray));
 	data->ray->pos_x = 18;
 	data->ray->pos_y = 18;  //x and y start position
-	data->ray->ms = 0.5;
-	data->ray->rs = 0.1;
+	data->ray->ms = 0.1;
+	data->ray->rs = 0.05;
 	data->ray->dir_x = -1;
 	data->ray->dir_y = 0; //initial direction vector
 	data->ray->plane_x = 0;
-	data->ray->plane_y = 1; //the 2d raycaster version of camera plane
+	data->ray->plane_y = 0.66; //the 2d raycaster version of camera plane
 	return (1);
 }
 
@@ -358,7 +358,6 @@ void	move_right(t_ray *ray)
 
 int		key_press(int keysym, t_data *data)
 {
-	printf("keysym - %d\n", keysym);
 	if (keysym == XK_w)
 	{
 		move_up(data->ray, data->world);
@@ -366,7 +365,7 @@ int		key_press(int keysym, t_data *data)
 	}
 	if (keysym == XK_s)
 	{
-		move_up(data->ray, data->world);
+		move_down(data->ray, data->world);
 		printf("You moved backward\n");
 	}
 	if (keysym == XK_a)
@@ -393,7 +392,7 @@ int		key_press(int keysym, t_data *data)
 	if (keysym == XK_Escape)
 	{
 		mlx_destroy_window(data->mlx, data->win);
-		mlx_loop_end(data->mlx);
+	//	mlx_loop_end(data->mlx);
 	}
 	return (1);
 }
@@ -444,7 +443,7 @@ int main(void)
 	mlx_loop_hook(data->mlx, &handle_no_event, &data);
 	mlx_hook(data->win, KeyPress, KeyPressMask, &key_press, data);
 	mlx_loop(data->mlx);
-	mlx_destroy_display(data->mlx);
+	//mlx_destroy_display(data->mlx);
 	free(data->ray);
 	free(data->img);
 	free(data->mlx);

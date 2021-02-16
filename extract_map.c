@@ -129,11 +129,14 @@ char *file_to_str(char *path_file)
 	return (tmp);
 }
 
-int max_char(char *s1, char *s2)
+int		max_width(char **map)
 {
-	int max;
+	int	max;
+	int	i;
 
 	max = 0;
+	i = 0;
+	while (s[i 
 	max = (int)(fmax(ft_strlen(s1), ft_strlen(s2)));
 	return (max);
 }
@@ -148,10 +151,7 @@ int	pre_parsing(char *map)
 	while (map[i])
 	{	
 		if(c_in_s(map[i], "\t 012NSEW\n") != 1) 
-		{	
-			printf("inappropriate character is = %c\n", map[i]);
 			return (-2);
-		}
 		i++;
 	}
 	return (1);
