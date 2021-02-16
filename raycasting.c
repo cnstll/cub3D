@@ -49,6 +49,11 @@ typedef struct s_ray {
 	double		ms;
 }				t_ray;
 
+typedef struct	s_textures {
+	void        *img;
+
+} 
+
 typedef struct  s_data {
 	void		*mlx;
 	void		*win;
@@ -57,6 +62,7 @@ typedef struct  s_data {
 	int			world[WORLD_WD][WORLD_HT];
 	t_ray		*ray;
 	t_img		*img;
+	t_textures	*textures;
 }               t_data;
 
 void            my_mlx_pixel_put(t_img *img, int x, int y, int color)
@@ -74,17 +80,6 @@ void            my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	img->addr[y * img->line_len + x * img->bpp / 8 + 1] = g;
 	img->addr[y * img->line_len + x * img->bpp / 8 + 2] = b;
 }
-
-/*int		any_directionnal_key(int keysim)
-{
-	char	**directionnal_key;
-	int		i;
-
-	directionnal_key[0][] = "XK_w";
-	directionnal_key[1][] = "XK_s";
-	directionnal_key[2][] = "XK_a";
-	directionnal_key[3][] = "XK_d";
-}*/
 
 int		init_window(t_data *data)
 {
@@ -314,6 +309,14 @@ int				render_next_frame(t_data *data)
 	return (1);
 }
 
+int		put_texture(t_data *data, char *file_path, int x, int y)
+{
+	data->img->img = mlx_xpm_file_to_image(
+							data->mlx , file_path, &data->width, &data->height);
+	mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
+	return (1);	
+}
+
 void	move_up(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 {
 	if(world[(int)(ray->pos_x + ray->dir_x * ray->ms)][(int)(ray->pos_y)] == 0)
@@ -400,6 +403,17 @@ int		key_press(int keysym, t_data *data)
 int		handle_no_event()
 {
 	return (1);
+}
+
+int init_textures(t_data *data)
+{
+	data->textures = malloc(sizeof(t_textures
+	
+}
+
+int load_textures(t_textures *textures)
+{
+			
 }
 
 int main(void)

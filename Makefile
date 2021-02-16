@@ -1,12 +1,12 @@
 NAME = cub3D
 
-SRCS = raycasting.c
+SRCS = mvp3.c
 
 OBJS = $(SRCS:.c=.o)
 
 HEADERS = includes
 
-MLX_REQ_LN = -Lmlx_linux -lmlx_Linux -Imlx_linux -lXext -lX11 -lm -lz
+MLX_REQ_LN = -Lmlx_linux -lmlx_Linux -Imlx_linux -lXext -lX11 -lm
 
 MLX_REQ_OSX = -Lmlx_osx -lmlx -framework OpenGL -framework AppKit
 
@@ -21,18 +21,18 @@ DEBUG = -g
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_OSX)
-	#	$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_LN)
+	#	$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_OSX)
+		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_LN)
 #		$(MAKE) -C ./libft
 #		cp libft/libft.a ./$(NAME)
 #		ar rcs $@ $^
 debug : 
-		$(CC) ${CFLAGS} ${DEBUG} -I ${HEADERS} -Imlx_osx  -o ${OBJS} -c ${SRCS} 
-		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_OSX)
+		$(CC) ${CFLAGS} ${DEBUG} -I ${HEADERS} -Imlx_linux -o ${OBJS} -c ${SRCS} 
+		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_LN)
 		
 %.o : %.c
-		$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_osx  -o $@ -c $<
-		#$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_linux -O3  -o $@ -c $<
+		#$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_osx  -o $@ -c $<
+		$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_linux -O3  -o $@ -c $<
 
 clean :
 #		$(MAKE) clean -C ./libft
