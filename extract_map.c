@@ -104,6 +104,49 @@ char *ft_strdup_til_char(char *s, char c, int start)
 	return (dup);
 }
 
+void str_to_array(char **src_map, int **dest_array, int max_width, int max_height)  
+{
+	int i;
+	int j;
+
+	j = 0;
+	while (i < max_height)
+	{
+		i = 0;
+		while (j < max_width)
+		{
+			if (src_map[i][j])
+				dest_array[i][j] = src_map[i][j];
+			else
+				dest_array[i][j] = ' ';
+			i++;
+		}
+		j++;
+	}
+}
+
+void print_array(int **array, int max_width, int max_height)
+{
+	int x;
+	int y;
+
+	x = 0;
+	while (x < max_height)
+	{
+		y = 0;
+		while (y < max_width)
+		{
+			printf("%d", array[x][y]);
+			if (y != 23)
+				printf(" ");
+			else
+				printf("\n");
+			y++;
+		}
+		x++;
+	}
+}
+
 char *file_to_str(char *path_file)
 {
 	int fd;
@@ -129,19 +172,34 @@ char *file_to_str(char *path_file)
 	return (tmp);
 }
 
-int		max_width(char **map)
+int		map_max_width(char **map)
 {
 	int	max;
 	int	i;
 
 	max = 0;
 	i = 0;
-	while (s[i 
-	max = (int)(fmax(ft_strlen(s1), ft_strlen(s2)));
+	while (map[i]) 
+	{	
+		max = (int)(fmax(ft_strlen(map[i]),max));
+		i++;
+	}
+	printf("max ln - %d\n", max);
 	return (max);
 }
 
-int	pre_parsing(char *map)
+int	map_max_height(char **map)
+{
+	int	max;	
+
+	max = 0;
+	while (map[max])
+		max++;
+	printf("max height - %d\n", max);
+	return (max);
+}
+
+int		pre_parsing(char *map)
 {
 	int i;
 
@@ -187,6 +245,7 @@ int extract_map_from_file(char *path_file)
 {
 	char	*tmp;
 	char	**map;
+	int		**map_tab;
 	int		r;
 	int		i;
 	int		j;
@@ -202,15 +261,10 @@ int extract_map_from_file(char *path_file)
 		free(tmp);
 		return (-1);
 	}
-	map = split_lines(tmp);
-	i = 0;
-	j = 0;	
-	while (map[j])
-	{
-		printf("%s", map[j]);
-		printf("\n");
-		j++;
-	}
+	map = split_lines(tmp);		
+	map_tab = malloc(sizeof(int) * (map_max_width(map) + map_max_height(map)));
+	str_to_array(map, map_tab, map_max_width(map), map_max_height(map));
+	
 	return (1);
 }
 
