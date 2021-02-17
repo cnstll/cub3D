@@ -20,50 +20,9 @@
 #include "cube.h"
 #define WORLD_WD 24
 #define WORLD_HT 24
-#define	READ_SIZE 32
+#define TEXTR_WD 64
+#define TEXTR_HT 64
 
-typedef struct	s_img {
-	void        *img;
-	char        *addr;
-	int         bpp;
-	int         line_len;
-	int         endian;
-	int			width;
-	int			height;
-	double		time;
-	double		old_time;
-}				t_img;	
-
-typedef struct s_ray {
-
-	double		pos_x;
-	double		pos_y;
-	double		dir_x;
-	double		dir_y;
-	double		plane_x;
-	double		plane_y;
-	double		camera_x;
-	double		ray_dir_x;
-	double		ray_dir_y; 
-	double		rs;
-	double		ms;
-}				t_ray;
-
-typedef struct	s_textures {
-	void        *img;
-
-} 
-
-typedef struct  s_data {
-	void		*mlx;
-	void		*win;
-	int			screen_ht;
-	int			screen_wd;
-	int			world[WORLD_WD][WORLD_HT];
-	t_ray		*ray;
-	t_img		*img;
-	t_textures	*textures;
-}               t_data;
 
 void            my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
@@ -175,6 +134,25 @@ int put_stripes(t_data *data, int x, int start, int end, int color)
 	return (1);
 }
 
+int clear_buffer(uint32_t **buffer, t_data *data)
+{
+	int x;
+	int y;
+
+	y = 0;    
+	while (y < data->screen_ht) 
+	{
+	
+		x = 0;
+		while(x < data->screen_wd)
+		{
+			buffer[y][x] = 0; //clear the buffer
+			x++;
+		}
+		y++;
+	}
+}
+
 int cast_img(t_data *data)
 {
 	int stripes;
@@ -196,6 +174,7 @@ int cast_img(t_data *data)
 	//drawing wall height
 	int draw_start;
 	int draw_end;
+	uint32_t buffer[data->screen_wd][data->screen_ht]; // y-coordinate first because it works per scanline
 	stripes = 0;
 	max_stripes = 640;
 	//printf("Before raycasting loop\n");
@@ -283,40 +262,73 @@ int cast_img(t_data *data)
 		draw_end = line_height / 2 + data->screen_ht / 2;
 		if(draw_end >= data->screen_ht)
 			draw_end = data->screen_ht - 1;
-		//ADAPT THIS CODE WITH MLX
-		//choose wall color
-		int color;
-		if(data->world[map_x][map_y] == 1)
-			color = 0x00FF0000;
+		//TTX - texturing calculations
+		int		tx_num;
+		double	wall_hit; //calculate value of wallX where exactly the wall was hit
+		int		tx_x;
+		int		tx_y; 
+		double	step;
+		double	tx_pos;
+		int		lines;	
+		uint32_t color;
 
-		//give x and y sides different brightness
-		if (side == 1)
-			color = 0x0000FF00;
+		tx_num = data->world[map_x][map_y] - 1; //1 subtracted from it so that texture 0 can be used!
+		if (side == 0) 
+			wall_hit = data->ray->pos_y + wall_dist * data->ray->ray_dir_y;
+		else           
+			wall_hit = data->ray->pos_x + wall_dist * data->ray->ray_dir_x;
+		wall_hit -= floor((wall_hit));
+
+		//x coordinate on the texture
+		tx_x = (int)(wall_hit * (double)(TEXTR_WD));
+		if(side == 0 && data->ray->ray_dir_x > 0)
+			tx_x = TEXTR_WD - tx_x - 1;
+		if(side == 1 && data->ray->ray_dir_y < 0)
+			tx_x = TEXTR_WD - tx_x - 1;
+		// How much to increase the texture coordinate per screen pixel
+		step = 1.0 * TEXTR_HT / line_height;
+		// Starting texture coordinate
+		tx_pos = (draw_start - data->screen_ht / 2 + line_height / 2) * step;
+		lines = draw_start;
+		while (lines < draw_end)
+		{
+			// Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+			tx_y = (int)(tx_pos) & (TEXTR_HT - 1);
+			tx_pos += step;
+			color = data->textures->img[tx_num][TEXTR_HT * tx_y + tx_x];
+			//make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+			if(side == 1) 
+				color = (color >> 1) & 8355711;
+			buffer[lines][stripes] = color;
+			lines++;
+		}
 
 		//draw the pixels of the stripe as a vertical line
 		put_stripes(data, stripes, draw_start, draw_end, color);
 		stripes++;
 	}
-	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
+	//mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
+    //drawBuffer(buffer[0]);
+	clear_buffer(buffer, data);
 	return (1);
 }
 
-int				render_next_frame(t_data *data)
+int		render_next_frame(t_data *data)
 {
 	mlx_destroy_image(data->mlx, data->img->img);
 	data->img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
 	cast_img(data);
 	return (1);
 }
-
+/*
 int		put_texture(t_data *data, char *file_path, int x, int y)
 {
 	data->img->img = mlx_xpm_file_to_image(
-							data->mlx , file_path, &data->width, &data->height);
+			data->mlx , file_path, &data->width, &data->height);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
 	return (1);	
 }
-
+*/
 void	move_up(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 {
 	if(world[(int)(ray->pos_x + ray->dir_x * ray->ms)][(int)(ray->pos_y)] == 0)
@@ -395,7 +407,7 @@ int		key_press(int keysym, t_data *data)
 	if (keysym == XK_Escape)
 	{
 		mlx_destroy_window(data->mlx, data->win);
-	//	mlx_loop_end(data->mlx);
+		mlx_loop_end(data->mlx);
 	}
 	return (1);
 }
@@ -407,13 +419,30 @@ int		handle_no_event()
 
 int init_textures(t_data *data)
 {
-	data->textures = malloc(sizeof(t_textures
-	
+	data->textures = malloc(sizeof(t_textures));
 }
 
-int load_textures(t_textures *textures)
+int load_textures(t_data *data, t_textures *textures)
 {
-			
+	int x;
+
+	textures->file_paths = malloc(sizeof(char *) * 4); 			
+	textures->width = TEXTR_WD;
+	textures->height = TEXTR_HT;
+	textures->file_paths[0] = "./textures/colorstone.xpm";
+	textures->file_paths[1] = "./textures/redbrick.xpm";
+	textures->file_paths[2] = "./textures/greystone.xpm";
+	textures->file_paths[3] = "./textures/wood.xpm";
+	
+	textures->img = malloc(sizeof(int**) * 4); 
+	x = 0;
+	while (x < 5)
+	{
+		textures->img[x] = mlx_xpm_file_to_image(
+			data->mlx, textures->file_paths[x], &textures->width, &textures->height);
+		x++;
+	}
+	//mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
 }
 
 int main(void)
@@ -457,7 +486,7 @@ int main(void)
 	mlx_loop_hook(data->mlx, &handle_no_event, &data);
 	mlx_hook(data->win, KeyPress, KeyPressMask, &key_press, data);
 	mlx_loop(data->mlx);
-	//mlx_destroy_display(data->mlx);
+	mlx_destroy_display(data->mlx);
 	free(data->ray);
 	free(data->img);
 	free(data->mlx);

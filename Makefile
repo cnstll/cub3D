@@ -1,6 +1,6 @@
 NAME = cub3D
 
-SRCS = mvp3.c
+SRCS = raycasting.c
 
 OBJS = $(SRCS:.c=.o)
 
