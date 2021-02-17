@@ -29,10 +29,14 @@ typedef struct s_ray {
 }				t_ray;
 
 typedef struct	s_textures {
-	int		width;
-	int		height;
-	char	**file_paths;	
-	int		***img;
+	int			width;
+	int			height;
+	char		**file_paths;	
+	void		*img;
+	char        **addr;
+	int         *bpp;
+	int         *line_len;
+	int         *endian;
 }				t_textures; 
 
 typedef struct  s_data {
@@ -40,7 +44,7 @@ typedef struct  s_data {
 	void		*win;
 	int			screen_ht;
 	int			screen_wd;
-	int			world[WORLD_WD][WORLD_HT];
+	int			world[24][24];
 	t_ray		*ray;
 	t_img		*img;
 	t_textures	*textures;

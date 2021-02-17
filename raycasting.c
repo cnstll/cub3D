@@ -435,11 +435,15 @@ int load_textures(t_data *data, t_textures *textures)
 	textures->file_paths[3] = "./textures/wood.xpm";
 	
 	textures->img = malloc(sizeof(int**) * 4); 
+	textures->bpp = malloc(sizeof(int) * 4);
+	textures->line_len = malloc(sizeof(int) * 4);
+	textures->endian = malloc(sizeof(int) * 4);
 	x = 0;
 	while (x < 5)
 	{
 		textures->img[x] = mlx_xpm_file_to_image(
 			data->mlx, textures->file_paths[x], &textures->width, &textures->height);
+		textures->addr[x] = mlx_get_data_addr(textures->img[x], &textures->bpp[x], &textures->line_len[x], texture->endian[x]); 
 		x++;
 	}
 	//mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
