@@ -38,8 +38,8 @@ int		init_window(t_data *data)
 
 int		init_img(t_data *data)
 {
-	if (data->img)
-		free(data->img);
+//	if (data->img)
+//		free(data->img);
 	data->img = malloc(sizeof(t_img));
 	data->img->time = 0; //time of current frame
 	data->img->old_time = 0; //time of previous fram
@@ -50,13 +50,13 @@ int		init_img(t_data *data)
 
 int		init_ray(t_data *data)
 {
-	if (data->ray)
-		free(data->img);
+//	if (data->ray)
+//		free(data->img);
 	data->ray = malloc(sizeof(t_ray));
 	data->ray->pos_x = 18;
 	data->ray->pos_y = 18;  //x and y start position
 	data->ray->ms = 0.1;
-	data->ray->rs = 0.05;
+	data->ray->rs = 0.1;
 	data->ray->dir_x = -1;
 	data->ray->dir_y = 0; //initial direction vector
 	data->ray->plane_x = 0;
@@ -109,7 +109,7 @@ int malloc_2d_array(int **array, int size)
 	int	i;
 
 	i = 0;
-	while (i < size) 
+	while (i < size)
 	{
 		array[i] = malloc(size * sizeof(*array[i]));
 		i++;
@@ -136,17 +136,18 @@ int draw_buffer(int **buffer, t_data *data)
 	int x;
 	int y;
 
-	y = 0;    
-	while (y < data->screen_ht) 
+	y = 0;
+	while (y < data->screen_ht)
 	{
 		x = 0;
 		while(x < data->screen_wd)
 		{
-			data->img->addr[y + x * data->screen_wd] = buffer[y][x];
+			data->img->addr[x + y * data->screen_wd] = buffer[y][x];
 			x++;
 		}
 		y++;
 	}
+	printf("max x - %d - max y - %d\n", x, y);
 	return (1);
 }
 
@@ -155,8 +156,8 @@ int clear_buffer(int **buffer, t_data *data)
 	int x;
 	int y;
 
-	y = 0;    
-	while (y < data->screen_ht) 
+	y = 0;
+	while (y < data->screen_ht)
 	{
 		x = 0;
 		while(x < data->screen_wd)
@@ -164,6 +165,26 @@ int clear_buffer(int **buffer, t_data *data)
 			buffer[y][x] = 0; //clear the buffer
 			x++;
 		}
+		y++;
+	}
+	return (1);
+}
+
+int print_buffer(int **buffer, t_data *data)
+{
+	int x;
+	int y;
+
+	y = 0;
+	while (y < data->screen_ht)
+	{
+		x = 0;
+		while(x < data->screen_wd)
+		{
+			printf("%d ",buffer[y][x]); //clear the buffer
+			x++;
+		}
+		printf("\n");
 		y++;
 	}
 	return (1);
@@ -192,7 +213,7 @@ int cast_img(t_data *data)
 	int draw_end;
 	int **buffer;
 	buffer = malloc(sizeof(*buffer) * data->screen_ht); // y-coordinate first because it works per scanline
-	malloc_2d_array(buffer, data->screen_wd);	
+	malloc_2d_array(buffer, data->screen_wd);
 	stripes = 0;
 	max_stripes = 640;
 	//printf("Before raycasting loop\n");
@@ -283,16 +304,16 @@ int cast_img(t_data *data)
 		//TTX - texturing calculations
 		double	wall_hit; //calculate value of wallX where exactly the wall was hit
 		int		tx_x;
-		int		tx_y; 
+		int		tx_y;
 		double	step;
 		double	tx_pos;
-		int		lines;	
+		int		lines;
 		int		color;
 
 		//tx_num = data->world[map_x][map_y] - 1; //1 subtracted from it so that texture 0 can be used!
-		if (side == 0) 
+		if (side == 0)
 			wall_hit = data->ray->pos_y + wall_dist * data->ray->ray_dir_y;
-		else           
+		else
 			wall_hit = data->ray->pos_x + wall_dist * data->ray->ray_dir_x;
 		wall_hit -= floor((wall_hit));
 
@@ -315,7 +336,7 @@ int cast_img(t_data *data)
 			if (side == 0)
 				color = data->textures->addr[0][TEXTR_HT * tx_y + tx_x];
 			//make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-			if (side == 1) 
+			if (side == 1)
 				color = data->textures->addr[1][TEXTR_HT * tx_y + tx_x];
 			buffer[lines][stripes] = color;
 			lines++;
@@ -325,6 +346,7 @@ int cast_img(t_data *data)
 		//put_stripes(data, stripes, draw_start, draw_end, color);
 		stripes++;
 	}
+	//print_buffer(buffer, data);
 	draw_buffer(buffer, data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
 	clear_buffer(buffer, data);
@@ -429,7 +451,7 @@ int		handle_no_event()
 
 void init_texture_elements(t_textures *textures)
 {
-	textures->img = (void **)malloc(sizeof(void *) * 4);	
+	textures->img = (void **)malloc(sizeof(void *) * 4);
 	textures->bpp = (int *)malloc(sizeof(int) * 4);
 	textures->line_len = (int *)malloc(sizeof(int) * 4);
 	textures->endian = (int *)malloc(sizeof(int) * 4);
@@ -442,7 +464,7 @@ int load_textures(t_data *data, t_textures *textures)
 {
 	int x;
 
-	textures->file_paths = (char **)malloc(sizeof(char *) * 5); 			
+	textures->file_paths = (char **)malloc(sizeof(char *) * 5);
 	textures->file_paths[0] = "./textures/colorstone.xpm";
 	textures->file_paths[1] = "./textures/redbrick.xpm";
 	textures->file_paths[2] = "./textures/greystone.xpm";
@@ -454,9 +476,9 @@ int load_textures(t_data *data, t_textures *textures)
 	{
 		textures->img[x] = mlx_xpm_file_to_image(
 				data->mlx, textures->file_paths[x], &textures->width[x], &textures->height[x]);
-		printf("After img x - %d\n", x); 	
-		textures->addr[x] = (int *)mlx_get_data_addr(textures->img[x], &textures->bpp[x], &textures->line_len[x], &textures->endian[x]); 
-		printf("After addr x - %d\n", x); 	
+		printf("After img x - %d\n", x);
+		textures->addr[x] = (int *)mlx_get_data_addr(textures->img[x], &textures->bpp[x], &textures->line_len[x], &textures->endian[x]);
+		printf("After addr x - %d\n", x);
 		//mlx_put_image_to_window(data->mlx, data->win, data->textures->img[x], x * 64, x * 64);
 		x++;
 	}
