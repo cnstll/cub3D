@@ -1,7 +1,7 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-/*# include "./structures.h"*/
+# include "./structures.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>

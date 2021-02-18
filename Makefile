@@ -1,6 +1,6 @@
 NAME = cub3D
 
-SRCS = test_textures.c
+SRCS = raycasting.c
 
 OBJS = $(SRCS:.c=.o)
 

@@ -3,7 +3,7 @@
 
 typedef struct	s_img {
 	void        *img;
-	char        *addr;
+	int        *addr;
 	int         bpp;
 	int         line_len;
 	int         endian;
@@ -29,11 +29,11 @@ typedef struct s_ray {
 }				t_ray;
 
 typedef struct	s_textures {
-	int			width;
-	int			height;
+	int			*width;
+	int			*height;
 	char		**file_paths;	
-	void		*img;
-	char        **addr;
+	void		**img;
+	int			**addr;
 	int         *bpp;
 	int         *line_len;
 	int         *endian;

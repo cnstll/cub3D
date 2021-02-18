@@ -23,23 +23,6 @@
 #define TEXTR_WD 64
 #define TEXTR_HT 64
 
-
-void            my_mlx_pixel_put(t_img *img, int x, int y, int color)
-{
-	unsigned char    *src;
-	unsigned char    r;
-	unsigned char    g;
-	unsigned char    b;
-
-	src = (unsigned char *)&color;
-	r = src[0];
-	g = src[1];
-	b = src[2];
-	img->addr[y * img->line_len + x * img->bpp / 8] = r;
-	img->addr[y * img->line_len + x * img->bpp / 8 + 1] = g;
-	img->addr[y * img->line_len + x * img->bpp / 8 + 2] = b;
-}
-
 int		init_window(t_data *data)
 {
 	data->mlx = mlx_init();
@@ -61,7 +44,7 @@ int		init_img(t_data *data)
 	data->img->time = 0; //time of current frame
 	data->img->old_time = 0; //time of previous fram
 	data->img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
-	data->img->addr = mlx_get_data_addr(data->img->img, &data->img->bpp, &data->img->line_len, &data->img->endian);
+	data->img->addr = (int *)mlx_get_data_addr(data->img->img, &data->img->bpp, &data->img->line_len, &data->img->endian);
 	return (1);
 }
 
@@ -121,6 +104,20 @@ void print_array(int src_array[WORLD_WD][WORLD_HT])
 	}
 }
 
+int malloc_2d_array(int **array, int size)
+{
+	int	i;
+
+	i = 0;
+	while (i < size) 
+	{
+		array[i] = malloc(size * sizeof(*array[i]));
+		i++;
+	}
+	return (1);
+}
+
+/*
 int put_stripes(t_data *data, int x, int start, int end, int color)
 {
 	int i;
@@ -133,8 +130,8 @@ int put_stripes(t_data *data, int x, int start, int end, int color)
 	}
 	return (1);
 }
-
-int clear_buffer(uint32_t **buffer, t_data *data)
+*/
+int draw_buffer(int **buffer, t_data *data)
 {
 	int x;
 	int y;
@@ -142,7 +139,25 @@ int clear_buffer(uint32_t **buffer, t_data *data)
 	y = 0;    
 	while (y < data->screen_ht) 
 	{
-	
+		x = 0;
+		while(x < data->screen_wd)
+		{
+			data->img->addr[y + x * data->screen_wd] = buffer[y][x];
+			x++;
+		}
+		y++;
+	}
+	return (1);
+}
+
+int clear_buffer(int **buffer, t_data *data)
+{
+	int x;
+	int y;
+
+	y = 0;    
+	while (y < data->screen_ht) 
+	{
 		x = 0;
 		while(x < data->screen_wd)
 		{
@@ -151,6 +166,7 @@ int clear_buffer(uint32_t **buffer, t_data *data)
 		}
 		y++;
 	}
+	return (1);
 }
 
 int cast_img(t_data *data)
@@ -174,7 +190,9 @@ int cast_img(t_data *data)
 	//drawing wall height
 	int draw_start;
 	int draw_end;
-	uint32_t buffer[data->screen_wd][data->screen_ht]; // y-coordinate first because it works per scanline
+	int **buffer;
+	buffer = malloc(sizeof(*buffer) * data->screen_ht); // y-coordinate first because it works per scanline
+	malloc_2d_array(buffer, data->screen_wd);	
 	stripes = 0;
 	max_stripes = 640;
 	//printf("Before raycasting loop\n");
@@ -263,16 +281,15 @@ int cast_img(t_data *data)
 		if(draw_end >= data->screen_ht)
 			draw_end = data->screen_ht - 1;
 		//TTX - texturing calculations
-		int		tx_num;
 		double	wall_hit; //calculate value of wallX where exactly the wall was hit
 		int		tx_x;
 		int		tx_y; 
 		double	step;
 		double	tx_pos;
 		int		lines;	
-		uint32_t color;
+		int		color;
 
-		tx_num = data->world[map_x][map_y] - 1; //1 subtracted from it so that texture 0 can be used!
+		//tx_num = data->world[map_x][map_y] - 1; //1 subtracted from it so that texture 0 can be used!
 		if (side == 0) 
 			wall_hit = data->ray->pos_y + wall_dist * data->ray->ray_dir_y;
 		else           
@@ -295,20 +312,21 @@ int cast_img(t_data *data)
 			// Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
 			tx_y = (int)(tx_pos) & (TEXTR_HT - 1);
 			tx_pos += step;
-			color = data->textures->img[tx_num][TEXTR_HT * tx_y + tx_x];
+			if (side == 0)
+				color = data->textures->addr[0][TEXTR_HT * tx_y + tx_x];
 			//make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-			if(side == 1) 
-				color = (color >> 1) & 8355711;
+			if (side == 1) 
+				color = data->textures->addr[1][TEXTR_HT * tx_y + tx_x];
 			buffer[lines][stripes] = color;
 			lines++;
 		}
 
 		//draw the pixels of the stripe as a vertical line
-		put_stripes(data, stripes, draw_start, draw_end, color);
+		//put_stripes(data, stripes, draw_start, draw_end, color);
 		stripes++;
 	}
-	//mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
-    //drawBuffer(buffer[0]);
+	draw_buffer(buffer, data);
+	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
 	clear_buffer(buffer, data);
 	return (1);
 }
@@ -320,15 +338,7 @@ int		render_next_frame(t_data *data)
 	cast_img(data);
 	return (1);
 }
-/*
-int		put_texture(t_data *data, char *file_path, int x, int y)
-{
-	data->img->img = mlx_xpm_file_to_image(
-			data->mlx , file_path, &data->width, &data->height);
-	mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
-	return (1);	
-}
-*/
+
 void	move_up(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 {
 	if(world[(int)(ray->pos_x + ray->dir_x * ray->ms)][(int)(ray->pos_y)] == 0)
@@ -417,36 +427,46 @@ int		handle_no_event()
 	return (1);
 }
 
-int init_textures(t_data *data)
+void init_texture_elements(t_textures *textures)
 {
-	data->textures = malloc(sizeof(t_textures));
+	textures->img = (void **)malloc(sizeof(void *) * 4);	
+	textures->bpp = (int *)malloc(sizeof(int) * 4);
+	textures->line_len = (int *)malloc(sizeof(int) * 4);
+	textures->endian = (int *)malloc(sizeof(int) * 4);
+	textures->addr = (int **)malloc(sizeof(int *) * 4);
+	textures->width = (int *)malloc(sizeof(int) * 4);
+	textures->height = (int *)malloc(sizeof(int) * 4);
 }
 
 int load_textures(t_data *data, t_textures *textures)
 {
 	int x;
 
-	textures->file_paths = malloc(sizeof(char *) * 4); 			
-	textures->width = TEXTR_WD;
-	textures->height = TEXTR_HT;
+	textures->file_paths = (char **)malloc(sizeof(char *) * 5); 			
 	textures->file_paths[0] = "./textures/colorstone.xpm";
 	textures->file_paths[1] = "./textures/redbrick.xpm";
 	textures->file_paths[2] = "./textures/greystone.xpm";
 	textures->file_paths[3] = "./textures/wood.xpm";
-	
-	textures->img = malloc(sizeof(int**) * 4); 
-	textures->bpp = malloc(sizeof(int) * 4);
-	textures->line_len = malloc(sizeof(int) * 4);
-	textures->endian = malloc(sizeof(int) * 4);
+	textures->file_paths[4] = 0;
+	init_texture_elements(data->textures);
 	x = 0;
-	while (x < 5)
+	while (x < 4)
 	{
 		textures->img[x] = mlx_xpm_file_to_image(
-			data->mlx, textures->file_paths[x], &textures->width, &textures->height);
-		textures->addr[x] = mlx_get_data_addr(textures->img[x], &textures->bpp[x], &textures->line_len[x], texture->endian[x]); 
+				data->mlx, textures->file_paths[x], &textures->width[x], &textures->height[x]);
+		printf("After img x - %d\n", x); 	
+		textures->addr[x] = (int *)mlx_get_data_addr(textures->img[x], &textures->bpp[x], &textures->line_len[x], &textures->endian[x]); 
+		printf("After addr x - %d\n", x); 	
+		//mlx_put_image_to_window(data->mlx, data->win, data->textures->img[x], x * 64, x * 64);
 		x++;
 	}
-	//mlx_put_image_to_window(data->mlx, data->win, data->img->img, x, y);
+	printf("While loop ended\n");
+}
+
+int init_textures(t_data *data)
+{
+	data->textures = malloc(sizeof(t_textures));
+	load_textures(data, data->textures);
 }
 
 int main(void)
@@ -486,6 +506,7 @@ int main(void)
 	//print_array(data->world);
 	init_img(data);
 	init_ray(data);
+	init_textures(data);
 	render_next_frame(data);
 	mlx_loop_hook(data->mlx, &handle_no_event, &data);
 	mlx_hook(data->win, KeyPress, KeyPressMask, &key_press, data);
