@@ -26,24 +26,14 @@ typedef struct s_ray {
 	double		rs;
 	double		ms;
 }				t_ray;
-/*
-typedef struct	s_textures {
-	int			*width;
-	int			*height;
-	char		**file_paths;	
-	void		**img;
-	int			**addr;
-	int         *bpp;
-	int         *line_len;
-	int         *endian;
-}				t_textures; 
-*/
+
 typedef struct  s_data {
 	void		*mlx;
 	void		*win;
 	int			screen_ht;
 	int			screen_wd;
 	int			world[24][24];
+	int			**buffer;
 	t_ray		*ray;
 	t_img		*img;
 	t_img		**textures;

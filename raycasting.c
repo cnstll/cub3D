@@ -23,6 +23,33 @@
 #define TEXTR_WD 64
 #define TEXTR_HT 64
 
+int malloc_2d_array(int **array, int size, int lines)
+{
+	int	i;
+
+	i = 0;
+	while (i < lines)
+	{
+		array[i] = malloc(size * sizeof(*array[i]));
+		i++;
+	}
+	return (1);
+}
+
+int free_2d_array(int **array, int lines)
+{
+	int	i;
+
+	i = 0;
+	while (i < lines)
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+	return (1);
+}
+
 int		init_window(t_data *data)
 {
 	data->mlx = mlx_init();
@@ -33,6 +60,8 @@ int		init_window(t_data *data)
 	data->win = mlx_new_window(data->mlx, data->screen_wd, data->screen_ht, "cub3D");
 	if (data->win == NULL)
 		return (-1);
+	data->buffer = malloc(sizeof(*data->buffer) * data->screen_ht); // y-coordinate first because it works per scanline
+	malloc_2d_array(data->buffer, data->screen_wd, data->screen_ht);
 	return (1);
 }
 
@@ -66,8 +95,9 @@ int load_textures(t_data *data, t_img **textures)
 	textures[1]->file_paths = "./textures/redbrick.xpm";
 	textures[2]->file_paths = "./textures/greystone.xpm";
 	textures[3]->file_paths = "./textures/wood.xpm";
+	textures[4]->file_paths = "./textures/pillar.xpm";
 	x = 0;
-	while (x < 4)
+	while (x < 5)
 	{
 		textures[x]->img = mlx_xpm_file_to_image(
 				data->mlx, textures[x]->file_paths, &textures[x]->width, &textures[x]->height);
@@ -83,8 +113,8 @@ int init_textures(t_data *data)
 	int x;
 
 	x = 0;
-	data->textures = malloc(sizeof(t_img *) * 4);
-	while (x < 4)
+	data->textures = malloc(sizeof(t_img *) * 5);
+	while (x < 5)
 	{
 		data->textures[x] = malloc(sizeof(**data->textures));
 		x++;
@@ -98,13 +128,13 @@ int	destroy_textures(t_data *data)
 	int x;
 
 	x = 0;	
-	while (x < 4)
+	while (x < 5)
 	{
 		mlx_destroy_image(data->mlx, data->textures[x]->img);
 		x++;
 	}
 	x = 0;
-	while (x < 4)
+	while (x < 5)
 		free(data->textures[x++]);
 	free(data->textures);
 	return (1);
@@ -148,19 +178,6 @@ void print_array(int src_array[WORLD_WD][WORLD_HT])
 		}
 		x++;
 	}
-}
-
-int malloc_2d_array(int **array, int size, int lines)
-{
-	int	i;
-
-	i = 0;
-	while (i < lines)
-	{
-		array[i] = malloc(size * sizeof(*array[i]));
-		i++;
-	}
-	return (1);
 }
 
 /*
@@ -256,9 +273,6 @@ int cast_img(t_data *data)
 	//drawing wall height
 	int draw_start;
 	int draw_end;
-	int **buffer;
-	buffer = malloc(sizeof(*buffer) * data->screen_ht); // y-coordinate first because it works per scanline
-	malloc_2d_array(buffer, data->screen_wd, data->screen_ht);
 	stripes = 0;
 	max_stripes = 640;
 	//printf("Before raycasting loop\n");
@@ -387,7 +401,7 @@ int cast_img(t_data *data)
 				color = data->textures[2]->addr[TEXTR_HT * tx_y + tx_x];
 			if (side == 1 && data->ray->ray_dir_y >= 0)
 				color = data->textures[3]->addr[TEXTR_HT * tx_y + tx_x];
-			buffer[lines][stripes] = color;
+			data->buffer[lines][stripes] = color;
 			lines++;
 		}
 
@@ -396,9 +410,9 @@ int cast_img(t_data *data)
 		stripes++;
 	}
 	//print_buffer(buffer, data);
-	draw_buffer(buffer, data);
+	draw_buffer(data->buffer, data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
-	clear_buffer(buffer, data);
+	clear_buffer(data->buffer, data);
 	return (1);
 }
 
@@ -488,6 +502,7 @@ int		key_press(int keysym, t_data *data)
 	if (keysym == XK_Escape)
 	{
 		destroy_textures(data);
+		free_2d_array(data->buffer, data->screen_ht);
 		mlx_destroy_window(data->mlx, data->win);
 		mlx_loop_end(data->mlx);
 	}
