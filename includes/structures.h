@@ -2,15 +2,14 @@
 #define STRUCTURES_H
 
 typedef struct	s_img {
+	char		*file_paths;	
 	void        *img;
-	int        *addr;
+	int			*addr;
 	int         bpp;
 	int         line_len;
 	int         endian;
 	int			width;
 	int			height;
-	double		time;
-	double		old_time;
 }				t_img;	
 
 typedef struct s_ray {
@@ -27,7 +26,7 @@ typedef struct s_ray {
 	double		rs;
 	double		ms;
 }				t_ray;
-
+/*
 typedef struct	s_textures {
 	int			*width;
 	int			*height;
@@ -38,7 +37,7 @@ typedef struct	s_textures {
 	int         *line_len;
 	int         *endian;
 }				t_textures; 
-
+*/
 typedef struct  s_data {
 	void		*mlx;
 	void		*win;
@@ -47,6 +46,6 @@ typedef struct  s_data {
 	int			world[24][24];
 	t_ray		*ray;
 	t_img		*img;
-	t_textures	*textures;
+	t_img		**textures;
 }               t_data;
 #endif
