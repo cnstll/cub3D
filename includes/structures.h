@@ -27,6 +27,18 @@ typedef struct s_ray {
 	double		ms;
 }				t_ray;
 
+typedef struct	s_input {
+
+	int			press;
+	int			keysym;
+	int			key_w;
+	int			key_s;
+	int			key_a;
+	int			key_d;
+	int			key_Left;
+	int			key_Right;
+}				t_input;
+
 typedef struct  s_data {
 	void		*mlx;
 	void		*win;
@@ -40,9 +52,4 @@ typedef struct  s_data {
 	t_input		**inputs;
 }               t_data;
 
-typedef struct	s_input {
-
-	int			press;
-	int			keysym;
-}				t_input;
 #endif

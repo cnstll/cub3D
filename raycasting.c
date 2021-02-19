@@ -152,8 +152,10 @@ int	init_inputs(t_data *data)
 	while (x < 6)
 	{
 		data->inputs[x] = malloc(sizeof(**data->inputs));
+		data->inputs[x]->press = 0;
 		x++;
 	}
+	return (1);
 }
 
 void init_array(int src_array[WORLD_WD][WORLD_HT], int dest_array[WORLD_WD][WORLD_HT])  
@@ -527,61 +529,62 @@ void	look_right(t_ray *ray)
 
 int		key_release(int keysym, t_data *data)
 {
-	if (keysym == XK_w )
-		data->input[0] = 0; 
+	printf("Key released\n");
+	if (keysym == XK_w)
+		data->inputs[0]->press = 0; 
 	if (keysym == XK_s)
-		data->input[1] = 0; 
+		data->inputs[1]->press = 0; 
 	if (keysym == XK_a)
-		data->input[2] = 0; 
+		data->inputs[2]->press = 0; 
 	if (keysym == XK_d)
-		data->input[3] = 0; 
+		data->inputs[3]->press = 0; 
 	if (keysym == XK_Left)
-		data->input[4] = 0; 
+		data->inputs[4]->press = 0; 
 	if (keysym == XK_Right)
-		data->input[5] = 0; 
+		data->inputs[5]->press = 0; 
 	return (1);
 
 }
 
 int		key_press(int keysym, t_data *data)
 {
-	if (keysym == XK_w )
+	if (keysym == XK_w || data->inputs[0]->press == 1)
 	{
 		move_up(data->ray, data->world);
-		data->input[0] = 1; 
+		data->inputs[0]->press = 1; 
 		printf("You moved forward\n");
 	}
-	if (keysym == XK_s)
+	if (keysym == XK_s || data->inputs[1]->press == 1)
 	{
 		move_down(data->ray, data->world);
-		data->input[1] = 1; 
+		data->inputs[1]->press = 1; 
 		printf("You moved backward\n");
 	}
-	if (keysym == XK_a)
+	if (keysym == XK_a || data->inputs[2]->press == 1)
 	{
 		move_left(data->ray, data->world);
-		data->input[2] = 1; 
+		data->inputs[2]->press = 1; 
 		printf("You moved left\n");
 	}
-	if (keysym == XK_d)
+	if (keysym == XK_d || data->inputs[3]->press == 1)
 	{
 		move_right(data->ray, data->world);
-		data->input[3] = 1; 
+		data->inputs[3]->press = 1; 
 		printf("You moved right\n");
 	}
-	if (keysym == XK_Left)
+	if (keysym == XK_Left || data->inputs[4]->press == 1)
 	{
 		look_left(data->ray);
-		data->input[4] = 1; 
+		data->inputs[4]->press = 1; 
 		printf("You looked left\n");
 	}
-	if (keysym == XK_Right)
+	if (keysym == XK_Right || data->inputs[5]->press == 1)
 	{
 		look_right(data->ray);
-		data->input[5] = 1; 
+		data->inputs[5]->press = 1; 
 		printf("You looked right\n");
 	}
-	if (keysym == XK_w || keysym == XK_s || keysym == XK_a || keysym == XK_d || keysym == XK_Left || keysym == XK_Right)
+	if (data->inputs[0]->press == 1 || data->inputs[1]->press == 1 || data->inputs[2]->press == 1 || data->inputs[3]->press == 1 || data->inputs[4]->press == 1 || data->inputs[5]->press == 1) 
 		render_next_frame(data);
 	if (keysym == XK_Escape && data->win)
 	{
@@ -590,6 +593,7 @@ int		key_press(int keysym, t_data *data)
 		mlx_destroy_window(data->mlx, data->win);
 		mlx_loop_end(data->mlx);
 	}
+	//if (keysym == XK_w || keysym == XK_s || keysym == XK_a || keysym == XK_d || keysym == XK_Left || keysym == XK_Right)
 	return (1);
 }
 
@@ -641,7 +645,7 @@ int main(void)
 	render_next_frame(data);
 	mlx_loop_hook(data->mlx, &handle_no_event, &data);
 	mlx_hook(data->win, KeyPress, KeyPressMask, &key_press, data);
-	mlx_hook(data->win, KeyRelease, KeyReleaseMask, &key_press, data);
+	mlx_hook(data->win, KeyRelease, KeyReleaseMask, &key_release, data);
 	mlx_loop(data->mlx);
 	mlx_destroy_display(data->mlx);
 	free(data->mlx);
