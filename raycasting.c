@@ -22,6 +22,9 @@
 #define WORLD_HT 24
 #define TEXTR_WD 64
 #define TEXTR_HT 64
+#define C_COLOR 0x00f9ff9d
+#define F_COLOR 0x00f0fbe6
+
 
 int malloc_2d_array(int **array, int size, int lines)
 {
@@ -140,6 +143,19 @@ int	destroy_textures(t_data *data)
 	return (1);
 }
 
+int	init_inputs(t_data *data)
+{
+	int x;
+
+	x = 0;
+	data->inputs = malloc(sizeof(t_input *) * 6);
+	while (x < 6)
+	{
+		data->inputs[x] = malloc(sizeof(**data->inputs));
+		x++;
+	}
+}
+
 void init_array(int src_array[WORLD_WD][WORLD_HT], int dest_array[WORLD_WD][WORLD_HT])  
 {
 	int x;
@@ -252,6 +268,32 @@ int print_buffer(int **buffer, t_data *data)
 	return (1);
 }
 
+int	draw_ceilling(t_data *data, int stripes, int wall_top)
+{
+	int i;
+
+	i = wall_top;
+	while (i >= 0)
+	{
+		data->buffer[i][stripes] = C_COLOR;
+		i--;
+	}
+	return (1);
+}
+
+int	draw_floor(t_data *data, int stripes, int wall_bot)
+{
+	int i;
+
+	i = data->screen_ht - 1;
+	while (i > wall_bot)
+	{
+		data->buffer[i][stripes] = F_COLOR;
+		i--;
+	}
+	return (1);
+}
+
 int cast_img(t_data *data)
 {
 	int stripes;
@@ -355,10 +397,10 @@ int cast_img(t_data *data)
 
 		//calculate lowest and highest pixel to fill in current stripe
 		draw_start = -line_height / 2 + data->screen_ht / 2;
-		if(draw_start < 0)
+		if(draw_start < 0 || draw_start >= data->screen_ht)
 			draw_start = 0;
 		draw_end = line_height / 2 + data->screen_ht / 2;
-		if(draw_end >= data->screen_ht)
+		if(draw_end >= data->screen_ht || draw_end < 0)
 			draw_end = data->screen_ht - 1;
 		//TTX - texturing calculations
 		double	wall_hit; //calculate value of wallX where exactly the wall was hit
@@ -394,17 +436,18 @@ int cast_img(t_data *data)
 			tx_pos += step;
 			if (side == 0 && data->ray->ray_dir_x < 0)
 				color = data->textures[0]->addr[TEXTR_HT * tx_y + tx_x];
-			if (side == 0 && data->ray->ray_dir_x >= 0)
+			else if (side == 0 && data->ray->ray_dir_x >= 0)
 				color = data->textures[1]->addr[TEXTR_HT * tx_y + tx_x];
 			//make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-			if (side == 1 && data->ray->ray_dir_y < 0)
+			else if (side == 1 && data->ray->ray_dir_y < 0)
 				color = data->textures[2]->addr[TEXTR_HT * tx_y + tx_x];
-			if (side == 1 && data->ray->ray_dir_y >= 0)
+			else
 				color = data->textures[3]->addr[TEXTR_HT * tx_y + tx_x];
 			data->buffer[lines][stripes] = color;
 			lines++;
 		}
-
+		draw_ceilling(data, stripes, draw_start);
+		draw_floor(data, stripes, draw_end);
 		//draw the pixels of the stripe as a vertical line
 		//put_stripes(data, stripes, draw_start, draw_end, color);
 		stripes++;
@@ -440,7 +483,23 @@ void	move_down(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 		ray->pos_y -= ray->dir_y * ray->ms;
 }
 
-void	move_left(t_ray *ray)
+void	move_left(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+{
+	if(world[(int)(ray->pos_x - ray->plane_x * ray->ms)][(int)(ray->pos_y)] == 0)
+		ray->pos_x -= ray->plane_x * ray->ms;
+	if(world[(int)(ray->pos_x)][(int)(ray->pos_y - ray->plane_y * ray->ms)] == 0)
+		ray->pos_y -= ray->plane_y * ray->ms;
+}
+
+void	move_right(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+{
+	if(world[(int)(ray->pos_x + ray->plane_x * ray->ms)][(int)(ray->pos_y)] == 0)
+		ray->pos_x += ray->plane_x * ray->ms;
+	if(world[(int)(ray->pos_x)][(int)(ray->pos_y + ray->plane_y * ray->ms)] == 0)
+		ray->pos_y += ray->plane_y * ray->ms;
+}
+
+void	look_left(t_ray *ray)
 {
 	double old_dir_x;
 	double old_plane_x;
@@ -451,9 +510,9 @@ void	move_left(t_ray *ray)
 	old_plane_x = ray->plane_x;
 	ray->plane_x = ray->plane_x * cos(ray->rs) - ray->plane_y * sin(ray->rs);
 	ray->plane_y = old_plane_x * sin(ray->rs) + ray->plane_y * cos(ray->rs);
-}
+} 
 
-void	move_right(t_ray *ray)
+void	look_right(t_ray *ray)
 {
 	double old_dir_x;
 	double old_plane_x;
@@ -464,42 +523,67 @@ void	move_right(t_ray *ray)
 	old_plane_x = ray->plane_x;
 	ray->plane_x = ray->plane_x * cos(-ray->rs) - ray->plane_y * sin(-ray->rs);
 	ray->plane_y = old_plane_x * sin(-ray->rs) + ray->plane_y * cos(-ray->rs);
+} 
+
+int		key_release(int keysym, t_data *data)
+{
+	if (keysym == XK_w )
+		data->input[0] = 0; 
+	if (keysym == XK_s)
+		data->input[1] = 0; 
+	if (keysym == XK_a)
+		data->input[2] = 0; 
+	if (keysym == XK_d)
+		data->input[3] = 0; 
+	if (keysym == XK_Left)
+		data->input[4] = 0; 
+	if (keysym == XK_Right)
+		data->input[5] = 0; 
+	return (1);
+
 }
 
 int		key_press(int keysym, t_data *data)
 {
-	if (keysym == XK_w)
+	if (keysym == XK_w )
 	{
 		move_up(data->ray, data->world);
+		data->input[0] = 1; 
 		printf("You moved forward\n");
 	}
 	if (keysym == XK_s)
 	{
 		move_down(data->ray, data->world);
+		data->input[1] = 1; 
 		printf("You moved backward\n");
 	}
 	if (keysym == XK_a)
 	{
-		move_left(data->ray);
+		move_left(data->ray, data->world);
+		data->input[2] = 1; 
 		printf("You moved left\n");
 	}
 	if (keysym == XK_d)
 	{
-		move_right(data->ray);
+		move_right(data->ray, data->world);
+		data->input[3] = 1; 
 		printf("You moved right\n");
 	}
 	if (keysym == XK_Left)
 	{
-		printf("You moved cam left\n");
+		look_left(data->ray);
+		data->input[4] = 1; 
+		printf("You looked left\n");
 	}
 	if (keysym == XK_Right)
 	{
-		//both camera direction and camera plane must be rotated
-		printf("You moved cam right\n");
+		look_right(data->ray);
+		data->input[5] = 1; 
+		printf("You looked right\n");
 	}
-	if (keysym == XK_w || keysym == XK_s || keysym == XK_a || keysym == XK_d)
+	if (keysym == XK_w || keysym == XK_s || keysym == XK_a || keysym == XK_d || keysym == XK_Left || keysym == XK_Right)
 		render_next_frame(data);
-	if (keysym == XK_Escape)
+	if (keysym == XK_Escape && data->win)
 	{
 		destroy_textures(data);
 		free_2d_array(data->buffer, data->screen_ht);
@@ -527,15 +611,15 @@ int main(void)
 		{1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
 		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
+		{1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+		{1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -553,9 +637,11 @@ int main(void)
 	init_img(data);
 	init_ray(data);
 	init_textures(data);
+	init_inputs(data);
 	render_next_frame(data);
 	mlx_loop_hook(data->mlx, &handle_no_event, &data);
 	mlx_hook(data->win, KeyPress, KeyPressMask, &key_press, data);
+	mlx_hook(data->win, KeyRelease, KeyReleaseMask, &key_press, data);
 	mlx_loop(data->mlx);
 	mlx_destroy_display(data->mlx);
 	free(data->mlx);

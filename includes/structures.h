@@ -37,5 +37,12 @@ typedef struct  s_data {
 	t_ray		*ray;
 	t_img		*img;
 	t_img		**textures;
+	t_input		**inputs;
 }               t_data;
+
+typedef struct	s_input {
+
+	int			press;
+	int			keysym;
+}				t_input;
 #endif
