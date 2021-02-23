@@ -1,5 +1,5 @@
 /* XPM */
-static char *_5cfef8003944d79a5000e2944cb192eRZdEcU9rtAQun4pq[] = {
+static char *pillar[] = {
 /* columns rows colors chars-per-pixel */
 "64 64 21 1 ",
 "  c black",
