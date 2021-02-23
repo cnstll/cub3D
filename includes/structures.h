@@ -51,6 +51,8 @@ typedef struct	s_sprite {
 	double		*distance;
 	double		x;
 	double		y;
+	int			tx_x;
+	int			tx_y;
 	double		invert;
 	double		transfo_x;
 	double		transfo_y;

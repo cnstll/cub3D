@@ -1,6 +1,8 @@
 NAME = cub3D
 
-SRCS = raycasting.c
+SRCS = srcs/raycasting.c \
+       srcs/sprite_casting.c\
+       srcs/sprite_sorter.c
 
 OBJS = $(SRCS:.c=.o)
 
