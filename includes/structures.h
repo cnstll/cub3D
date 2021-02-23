@@ -49,8 +49,9 @@ typedef struct	s_sprite {
 	double		*buffer;
 	int			*order;
 	double		*distance;
-	double		sprite_x;
-	double		sprite_y;
+	double		x;
+	double		y;
+	double		invert;
 	double		transfo_x;
 	double		transfo_y;
 	int			start_x;

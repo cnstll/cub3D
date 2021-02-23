@@ -22,15 +22,16 @@
 #define WORLD_HT 24
 #define TEXTR_WD 64
 #define TEXTR_HT 64
-#define C_COLOR 0X00F9FF9D
-#define F_COLOR 0X00F0FBE6
+#define C_COLOR 0X00FFF89B
+#define F_COLOR 0X00FFC99B
 
 void	destroy_sprites(t_data *data)
 {
-	free(data->sprites);
-	free(data->sp_buffer);
-	free(data->sp_order);
-	free(data->sp_distance);
+	free(data->sprite->buffer);
+	free(data->sprite->order);
+	free(data->sprite->distance);
+	free(data->sprite->sp);
+	free(data->sprite);
 }
 
 void	free_all(t_data *data)
@@ -86,14 +87,6 @@ int		init_window(t_data *data)
 	return (1);
 }
 
-int		init_map(t_data *data)
-{
-	data->sprite = malloc(sizeof(t_sprite));
-	data->sprite->num = 8;
-	data->sprite->buffer = malloc(sizeof(double) * data->screen_wd);
-	data->sprite->order = malloc(sizeof(int) * data->sprite->num);
-	data->sprite->distance = malloc(sizeof(double) * data->sprite->num);
-}
 
 int		init_img(t_data *data)
 {
@@ -127,7 +120,7 @@ int load_textures(t_data *data, t_img **textures)
 	textures[1]->file_paths = "./textures/redbrick.xpm";
 	textures[2]->file_paths = "./textures/greystone.xpm";
 	textures[3]->file_paths = "./textures/wood.xpm";
-	textures[4]->file_paths = "./textures/pillar.xpm";
+	textures[4]->file_paths = "./textures/barrel.xpm";
 	x = 0;
 	while (x < 5)
 	{
@@ -157,6 +150,11 @@ int init_textures(t_data *data)
 
 int	init_sprites(t_data *data)
 {
+	data->sprite = malloc(sizeof(t_sprite));
+	data->sprite->num = 8;
+	data->sprite->buffer = malloc(sizeof(double) * data->screen_wd);
+	data->sprite->order = malloc(sizeof(int) * data->sprite->num);
+	data->sprite->distance = malloc(sizeof(double) * data->sprite->num);
 	data->sprite->sp = malloc(sizeof(t_sp) * data->sprite->num);
 	data->sprite->sp[0] = (t_sp){21.5, 1.5, 4};
 	data->sprite->sp[1] = (t_sp){15.5, 1.8, 4};
@@ -166,6 +164,12 @@ int	init_sprites(t_data *data)
 	data->sprite->sp[5] = (t_sp){9.5, 15.1, 4};
 	data->sprite->sp[6] = (t_sp){10.5, 15.8, 4};
 	data->sprite->sp[7] = (t_sp){11.5, 1.5, 4};
+	return (1);
+}
+
+int		init_map(t_data *data)
+{
+	init_sprites(data);
 	return (1);
 }
 
@@ -316,120 +320,143 @@ int	put_floor(t_data *data, int stripes, int wall_bot)
 		data->buffer[i++][stripes] = F_COLOR;
 	return (1);
 }
+void	swap_int(int *a, int *b)
+{
+	int tmp;
 
-int bubble_sort(void *array, int size)
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+void	swap_double(double *a, double *b)
+{
+	double tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+void	bubble_sort_with_order(double *array, int *order, int size)
 {
 	int i;
-	int	tmp;
 	int	done;
 
-	i = 0;
 	done = 1;
-	tmp = 0;
 	while (done > 0)
 	{
+		i = 0;
 		while (i < size - 1)
 		{
-			tmp = array[i];
 			if (array[i] < array[i + 1])
 			{
-				array[i] = array[i + 1];
-				array[i + 1] = tmp;
+				swap_double(&array[i], &array[i + 1]);
+				swap_int(&order[i], &order[i + 1]);
 				done++;
 			}
 			else if (array[i] > array[i + 1])
 				done--;
 			i++;
 		}
-		i = 0;
 	}
 }
 
-int	sort_sprites(t_ray *ray, t_sprite *sprite)
+void	sort_sprites(t_ray *ray, t_sprite *sprite)
 {
 	int i;
 
 	i = 0;
-    while(i < sprite->num)
-    {
+	while(i < sprite->num)
+	{
 		sprite->order[i] = i;
-		sprite->distance[i] = ((ray->pos_x - sprite->sp[i]->x)
-			* (ray->pos_x - sprite->sp[i]->x) + (ray->pos_y - sprite->sp[i]->y) 
-			* (ray->pos_y - sprite->sp[i]->y));
+		sprite->distance[i] = ((ray->pos_x - sprite->sp[i].x)
+				* (ray->pos_x - sprite->sp[i].x) + (ray->pos_y - sprite->sp[i].y) 
+				* (ray->pos_y - sprite->sp[i].y));
 		i++;
 	}
-	bubble_sort(sprite->distance, sprite->num);
+	bubble_sort_with_order(sprite->distance, sprite->order, sprite->num);
+}
+void	put_sprite(t_data *data, t_sprite *sprite)
+{
+	int i;
+	int y;
+	int d;
+	int tx_x;
+	int tx_y;
+	int color;
+
+	i = sprite->start_x;
+	while (i < sprite->end_x)
+	{
+		tx_x = (int)(256 * (i - (-sprite->width / 2 + sprite->screen_x)) * TEXTR_WD / sprite->width) / 256;
+		if(sprite->transfo_y > 0 && i > 0 && i < data->screen_wd && sprite->transfo_y < sprite->buffer[i])
+		{
+			y = sprite->start_y;
+			while(y < sprite->end_y) //for every pixel of the current stripe
+			{
+				//printf("i - %d <> y - %d <> end_y %d\n", i, y, sprite->end_y);
+				d = y * 256 - data->screen_ht * 128 + sprite->height * 128; //256 and 128 factors to avoid floats
+				tx_y = ((d * TEXTR_HT) / sprite->height) / 256;
+				color = data->textures[4]->addr[TEXTR_WD * tx_y + tx_x]; //get current color from the texture
+				if((color & 0x00FFFFFF) != 0)
+					data->buffer[y][i] = color; //paint pixel if it isn't black, black is the invisible color
+				y++;
+			}
+		}
+		i++;
+	}
 }
 
-int	put_sprites(t_data *data)
+void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite, int w)
 {
-    //SPRITE CASTING
-    //sort sprites from far to close
+	//SPRITE CASTING
+	//sort sprites from far to close
 	int i;
 
+	//after sorting the sprites, do the projection and draw them
 	i = 0;
-    while(i < data->sp_num)
-    {
-		data->sp_order[i] = i;
-		data->sprites_info->distance[i] = ((data->ray->pos_x - data->sprites[i]->x) * (data->ray->pos_x - data->sprites[i]->x) + (data->ray->pos_y - data->sprites[i]->y) * (data->ray->pos_y - data->sprites[i]->y));
+	sort_sprites(ray, sprite);
+	while(i < sprite->num)
+	{
+		sprite->x = sprite->sp[sprite->order[i]].x - ray->pos_x;
+		sprite->y = sprite->sp[sprite->order[i]].y - ray->pos_y;
+
+		//transform sprite with the inverse camera matrix
+		// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+		// [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+		sprite->invert = 1.0 / (ray->plane_x * ray->dir_y - ray->dir_x * ray->plane_y); //required for correct matrix multiplication
+
+		sprite->transfo_x = sprite->invert * (ray->dir_y * sprite->x - ray->dir_x * sprite->y);
+		sprite->transfo_y = sprite->invert * (-ray->plane_y * sprite->x + ray->plane_x * sprite->y); //this is actually the depth inside the screen, that what Z is in 3D
+
+		sprite->screen_x = (int)((w / 2) * (1 + sprite->transfo_x / sprite->transfo_y));
+
+		//calculate height of the sprite on screen
+		sprite->height = fabs((int)(data->screen_ht / (sprite->transfo_y))); //using 'transformY' instead of the real distance prevents fisheye
+		//calculate lowest and highest pixel to fill in current stripe
+		sprite->start_y = -sprite->height / 2 + data->screen_ht / 2;
+		if(sprite->start_y < 0)
+			sprite->start_y = 0;
+		sprite->end_y = sprite->height / 2 + data->screen_ht / 2;
+		if(sprite->end_y >= data->screen_ht)
+			sprite->end_y = data->screen_ht - 1;
+
+		//calculate width of the sprite
+		sprite->width = fabs((int)(data->screen_ht / sprite->transfo_y));
+		sprite->start_x = -sprite->width / 2 + sprite->screen_x;
+		if(sprite->start_x < 0)
+			sprite->start_x = 0;
+		sprite->end_x = sprite->width / 2 + sprite->screen_x;
+		if(sprite->end_x >= w)
+			sprite->end_x = w - 1;
+		//loop through every vertical stripe of the sprite on screen
+		put_sprite(data, sprite);
+		//printf("sprite max - %d <> sprite num - %d\n", sprite->num, i);
 		i++;
 	}
-    sort_sprites(data->sp_order, data->sp_distance, data->sp_num);
-
-    //after sorting the sprites, do the projection and draw them
-    i = 0;
-	while(i < data->sp_num)
-    {
-      //translate sprite position to relative to camera
-      double spriteX = sprite[spriteOrder[i]].x - posX;
-      double spriteY = sprite[spriteOrder[i]].y - posY;
-
-      //transform sprite with the inverse camera matrix
-      // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-      // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-      // [ planeY   dirY ]                                          [ -planeY  planeX ]
-
-      double invDet = 1.0 / (planeX * dirY - dirX * planeY); //required for correct matrix multiplication
-
-      double transformX = invDet * (dirY * spriteX - dirX * spriteY);
-      double transformY = invDet * (-planeY * spriteX + planeX * spriteY); //this is actually the depth inside the screen, that what Z is in 3D
-
-      int spriteScreenX = int((w / 2) * (1 + transformX / transformY));
-
-      //calculate height of the sprite on screen
-      int spriteHeight = abs(int(h / (transformY))); //using 'transformY' instead of the real distance prevents fisheye
-      //calculate lowest and highest pixel to fill in current stripe
-      int drawStartY = -spriteHeight / 2 + h / 2;
-      if(drawStartY < 0) drawStartY = 0;
-      int drawEndY = spriteHeight / 2 + h / 2;
-      if(drawEndY >= h) drawEndY = h - 1;
-
-      //calculate width of the sprite
-      int spriteWidth = abs( int (h / (transformY)));
-      int drawStartX = -spriteWidth / 2 + spriteScreenX;
-      if(drawStartX < 0) drawStartX = 0;
-      int drawEndX = spriteWidth / 2 + spriteScreenX;
-      if(drawEndX >= w) drawEndX = w - 1;
-
-      //loop through every vertical stripe of the sprite on screen
-      for(int stripe = drawStartX; stripe < drawEndX; stripe++)
-      {
-        int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
-        //the conditions in the if are:
-        //1) it's in front of camera plane so you don't see things behind you
-        //2) it's on the screen (left)
-        //3) it's on the screen (right)
-        //4) ZBuffer, with perpendicular distance
-        if(transformY > 0 && stripe > 0 && stripe < w && transformY < ZBuffer[stripe])
-        for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
-        {
-          int d = (y) * 256 - h * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
-          int texY = ((d * texHeight) / spriteHeight) / 256;
-          Uint32 color = texture[sprite[spriteOrder[i]].texture][texWidth * texY + texX]; //get current color from the texture
-          if((color & 0x00FFFFFF) != 0) buffer[y][stripe] = color; //paint pixel if it isn't black, black is the invisible color
-        }
-      }
-    }	
 }
 
 int cast_img(t_data *data)
@@ -579,11 +606,11 @@ int cast_img(t_data *data)
 		put_floor(data, stripes, draw_end);
 		//draw the pixels of the stripe as a vertical line
 		//put_stripes(data, stripes, draw_start, draw_end, color);
-		data->sp_buffer[stripes] = wall_dist;
+		data->sprite->buffer[stripes] = wall_dist;
 		stripes++;
 	}
 	//print_buffer(buffer, data);
-	put_sprites(t_data *data);
+	handle_sprites(data, data->ray, data->sprite, data->screen_wd);
 	draw_buffer(data->buffer, data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
 	clear_buffer(data->buffer, data);
@@ -703,6 +730,27 @@ int		key_press(int keysym, t_data *data)
 	return (1);
 }
 
+int any_key_pressed(t_input *inputs)
+{
+	int ret;
+
+	if (inputs->key_w == 1)
+		ret = 1;
+	else if (inputs->key_s == 1)
+		ret = 1;
+	else if (inputs->key_a == 1)
+		ret = 1;
+	else if (inputs->key_d == 1)
+		ret = 1;
+	else if (inputs->key_left == 1)
+		ret = 1;
+	else if (inputs->key_right == 1)
+		ret = 1;
+	else
+		ret = 0;
+	return (ret);
+}
+
 int		handle_player_move(t_data *data)
 {
 	int	esc;
@@ -720,11 +768,25 @@ int		handle_player_move(t_data *data)
 		look_left(data->ray);
 	if (data->inputs->key_right == 1)
 		look_right(data->ray);
-	if (esc < 1)
+	if (any_key_pressed(data->inputs) == 1 && esc < 1)
 		render_next_frame(data);
 	return (1);
 }
 
+int		clic_to_close(int clic, t_data *data)
+{
+	printf("%d\n", clic);
+	if (clic == 1634464352)
+	{
+		printf("closing\n");
+		data->inputs->key_esc = 1;
+		destroy_textures(data);
+		free_2d_array(data->buffer, data->screen_ht);
+		mlx_destroy_window(data->mlx, data->win);
+		mlx_loop_end(data->mlx);
+	}
+	return(1);
+}
 
 int main(void)
 {
@@ -764,10 +826,12 @@ int main(void)
 	init_img(data);
 	init_ray(data);
 	init_textures(data);
+	init_map(data);
 	init_inputs(data);
 	render_next_frame(data);
 	mlx_hook(data->win, 2, 1L<<0, &key_press, data);
 	mlx_hook(data->win, 3, 1L<<1, &key_release, data);
+	mlx_hook(data->win, 33, 1L<<17, &clic_to_close, data);
 	mlx_loop_hook(data->mlx, &handle_player_move, data);
 	mlx_loop(data->mlx);
 	mlx_destroy_display(data->mlx);
