@@ -1,6 +1,19 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+typedef struct s_config {
+	char		*resolution_x;
+	char		*resolution_y;
+	char		*tx_no;
+	char		*tx_so;
+	char		*tx_ea;
+	char		*tx_we;
+	char		*tx_sprite;
+	char		*f_color;
+	char		*c_color;
+	int			count_param;
+}				t_config;
+
 typedef struct	s_img {
 	char		*file_paths;
 	void        *img;
@@ -78,6 +91,7 @@ typedef struct  s_data {
 	t_img		**textures;
 	t_input		*inputs;
 	t_sprite	*sprite;
+	t_config	*config;
 }               t_data;
 
 #endif

@@ -6,7 +6,7 @@
    - A '0', '2', 'N', 'S', 'E', 'W', cannot be in the first position of a row or the last one
    - A '0', '2', 'N', 'S', 'E', 'W', cannot be in the first row or the last row
  */
-/*	
+/*
 	char map[8][8] = {	{'1', '1', '1', '1', '1', '1', '1', '1'},
 	{'1', '0', '0', '0', '0', '0', '0', '1'},
 	{'1', '0', '1', 'N', '0', '0', '0', '1'},
@@ -36,33 +36,6 @@ void	free_all(t_data *data)
 	free(data->inputs);
 	destroy_sprites(data);
 	free(data);
-}
-
-int malloc_2d_array(int **array, int size, int lines)
-{
-	int	i;
-
-	i = 0;
-	while (i < lines)
-	{
-		array[i] = (int *)malloc(size * sizeof(int));
-		i++;
-	}
-	return (1);
-}
-
-int free_2d_array(int **array, int lines)
-{
-	int	i;
-
-	i = 0;
-	while (i < lines)
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
-	return (1);
 }
 
 int		init_window(t_data *data)
