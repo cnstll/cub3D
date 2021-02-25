@@ -4,12 +4,16 @@ void	error_handler(int error)
 {
 	if (error < 0)
 		printf("Error\n");
-	if (error == -1)
+	else if (error == -1)
 		printf("Empty map!\n");
-	if (error == -2)
+	else if (error == -2)
 		printf("Inappropriate character in map\n");
-	if (error == -3)
+	else if (error == -3)
 		printf("Wrong game configuration\n");
+	else if (error == -4)
+		printf("Empty configuration file\n");
+	else
+		printf("Configuration ok\n");
 }
 
 void init_config(t_data *data)
@@ -22,8 +26,8 @@ void init_config(t_data *data)
 	data->config->tx_ea = "";
 	data->config->tx_we = "";
 	data->config->tx_sprite = "";
-	data->config->f_color = "";
-	data->config->c_color = "";
+	data->config->f_color = 0;
+	data->config->c_color = 0;
 	data->config->count_param = 0;
 }
 
@@ -43,10 +47,7 @@ void	destroy_config(t_config *config)
 		free(config->tx_we);
 	if (config->tx_sprite[0] != '\0')
 		free(config->tx_sprite);
-	if (config->f_color[0] != '\0')
-		free(config->f_color);
-	if (config->c_color[0] != '\0')
-		free(config->c_color);
+	free(config);
 }
 
 int count_c_in_s(char c, char *s)
@@ -173,42 +174,10 @@ int		map_pre_parsing(char *map)
 	return (1);
 }
 
-char **ft_lite_split(char *s, char c)
-{
-	char **ret;
-	int		j;
-	int		k;
-	int		n_lines;
-
-	j = 0;
-	k = 0;
-	n_lines = count_c_in_s(c, s);
-	ret = (char **)malloc(sizeof(char *) * (n_lines + 1));
-	if (ret == NULL)
-		return (NULL);
-	while (j < n_lines)
-	{
-		ret[j] = ft_strdup_till_char(s, c, k);
-		while (s[k] && s[k] != c)
-			k++;
-		if (s[k] == c)
-			k++;
-		j++;
-	}
-	ret[n_lines] = 0;
-	return (ret);
-}
-
-int	window_resolution()
-{
-
-	return (1);
-}
-
-int valid_elements_pair(char e1, char e2)
+int valid_elements_pair(char e1, char e2, t_config *config)
 {
 	config->count_param++;
-	if (c_in_s(e1, "RFC") == 1 && e2 == ' ')
+	if (c_in_s(e1, "RFC") > 0 && e2 == ' ')
 		return (1);
 	else if (e1 == 'S' && (e2 == ' ' || e2 == 'O'))
 		return (1);
@@ -260,10 +229,14 @@ int	check_res(char *p, int start)
 
 	j = start;
 	space = 0;
+	if (p[0] != 'R')
 	while (p[j])
 	{
-		if (ft_isdigit(p[j]) == 1 || (p[j++] == ' ' && space == 0))
+		if (ft_isdigit(p[j]) == 1 || ((p[j] == ' ' && space == 0)))
+		{	
 			space = 1;
+			j++;
+		}
 		else
 			return (-1);
 	}
@@ -284,22 +257,23 @@ void	copy_res(char *p, t_config *config, int start)
 	while (ft_isdigit(p[++j]) == 1)
 		config->resolution_y = ft_str_append(p + start, p[j]);
 }
-
 unsigned long rgb_to_hex(int r, int g, int b)
-{
-    unsigned long	u;
-	
-	u =  ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF);
+{   
+    unsigned int	u;
+
+	u = ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
 	return (u);
 }
 
 int	check_color(char *p, int start)
 {
 	int j;
-	int space;
+	int comma;
 
 	j = start;
 	comma = 0;
+	if (p[0] != 'C' || p[0] != 'F')
+		return (-1);
 	while (p[j])
 	{
 		if (ft_isdigit(p[j]) == 1 || (p[j++] == ',' && comma < 2))
@@ -313,70 +287,75 @@ int	check_color(char *p, int start)
 
 void	copy_color(char *p, t_config *config, int start)
 {
-	int	r;
-	int	g;
-	int	b;
+	int r;
+	int g;
+	int b;
 	char **tmp;
 
-	tmp = ft_lite_split(p, ',');
-	r = ft_lite_atoi(p[0]);
-	g = ft_lite_atoi(p[1]);
-	b = ft_lite_atoi(p[2]);
-	if (p[0] = 'F')		
-		config->f_color = rgb_to_hex(r, g, b);
-	if (p[0] = 'C')		
-		config->c_color = rgb_to_hex(r, g, b);
+	tmp = ft_lite_split(p + start, ',');	
+	r = ft_lite_atoi(tmp[0]);
+	g = ft_lite_atoi(tmp[1]);
+	b = ft_lite_atoi(tmp[2]);
+	if (p[0] == 'F')
+		config->f_color = rgb_to_hex(r,g,b);
+	else if (p[0] == 'C')
+		config->c_color = rgb_to_hex(r,g,b);
+	else
+		return ;
 }
 
-int parse_param_line(char *p, t_data *data, t_config *config)
+void	parse_param_line(char *p, t_config *config)
 {
 	int i;
 	int done;
 
 	i = 2;
-	done == 1;
+	done = 1;
 	while (p[i] && done == 1)
 	{
-		if (p[i] = ' ')
+		if (p[i] == ' ')
 			i++;
-		else if (p[i] = '.' && p[i + 1] = '/')
+		else if (p[i] == '.' && p[i + 1] == '/')
 		{
 			if (check_path_file(p, i + 2) == 1)
 			{
-				copy_path_file(p, i);
+				copy_path_file(p, config, i);
 				done = 0;
 			}
 			else
 				return (error_handler(-3));
 		}
-		else if(ft_isdigit(p[i]) && check_res(p, i) == 1 && p[0] = 'R')
-			copy_res(p, i);
+		else if(ft_isdigit(p[i]) && check_res(p, i) == 1)
+			copy_res(p, config, i);
 		else if(ft_isdigit(p[i]) && check_color(p, i) == 1)
-			copy_color(p, i);
+			copy_color(p, config, i);
 		else
 			return (error_handler(-3));
 	}
 }
 
 // 8 Elements to parse before map
-int	parsing_parameters(char **param, t_data *data, t_config *config)
+int	parsing_parameters(char **param, t_config *config)
 {
 	int i;
 
 	i = 0;
+	if (!param[i])
+		return (-4);
 	while (param[i])
 	{
 		if (param[i][0] == '\n')
 			i++;
-		else if (valid_elements_pair(param[i][0], param[i][1] == 1) && config->count_param < 8)
-			parse_param_line(param[i], data, config);
+		else if (valid_elements_pair(param[i][0], param[i][1], config) && config->count_param < 8)
+			parse_param_line(param[i], config);
 		else if (param[i][0] == '1' && config->count_param == 8)
-			//map!
+			i++;
 		else if (param[i][0] == ' ' && config->count_param == 8)
-			//look what's next
+			i++;
 		else
-			return (error_handler(-3));
+			return (-3);
 	}
+	return (1);
 }
 
 /*
@@ -411,13 +390,14 @@ int extract_config_elements(t_data *data, char *path_file)
 {
 	char	*tmp;
 	char	**param;
+	int		r;
 
 	tmp = file_to_str(path_file);
 	if (!tmp)
-		return (error_handler(-1));
+		return (-1);
 	param = ft_lite_split(tmp, '\n');
-	parsing_parameters(param, data, data->config);
-
+	r = parsing_parameters(param, data->config);
+	return (r);
 }
 
 int main(void)
@@ -426,8 +406,10 @@ int main(void)
 
 	data = malloc(sizeof(t_data));
 	init_config(data);
-	extract_map_from_file("./map_test.cub", data);
-	free(data->config);
+	error_handler(extract_config_elements(data, "./map_full_test.cub"));
+	printf("config->reso_x -- %s\n", data->config->resolution_x);
+	printf("config->reso_y -- %s\n", data->config->resolution_y);
+	destroy_config(data->config);
 	free(data);
 	return (1);
 }

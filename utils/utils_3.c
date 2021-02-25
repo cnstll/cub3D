@@ -12,16 +12,6 @@
 
 #include "../includes/cube.h"
 
-size_t				ft_strlen(const char *s)
-{
-	unsigned int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-
 char			*ft_strdup(const char *s)
 {
 	char			*dup;
@@ -62,7 +52,7 @@ char			*ft_str_append(char *s, char c)
 	return (r);
 }
 
-int				*ft_lite_atoi(const char *s)	
+int				ft_lite_atoi(const char *s)	
 {
 	char	*nbr;
 	int		n;
@@ -81,3 +71,34 @@ int				*ft_lite_atoi(const char *s)
 	}
 	return (n);
 }
+
+char **ft_lite_split(char *s, char c)
+{
+	char	**ret;
+	int		j;
+	int		k;
+	int		n_sep;
+
+	j = 0;
+	k = 0;
+	n_sep = 0;
+	while (s && s[j])
+		if (s[j++] == c)
+			n_sep++;
+	j = 0;
+	ret = (char **)malloc(sizeof(char *) * (n_sep + 1));
+	if (ret == NULL)
+		return (NULL);
+	while (j < n_sep)
+	{
+		ret[j] = ft_strdup_till_char(s, c, k);
+		while (s[k] && s[k] != c)
+			k++;
+		if (s[k] == c)
+			k++;
+		j++;
+	}
+	ret[n_sep] = 0;
+	return (ret);
+}
+

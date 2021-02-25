@@ -2,16 +2,16 @@
 #define STRUCTURES_H
 
 typedef struct s_config {
-	char		*resolution_x;
-	char		*resolution_y;
-	char		*tx_no;
-	char		*tx_so;
-	char		*tx_ea;
-	char		*tx_we;
-	char		*tx_sprite;
-	char		*f_color;
-	char		*c_color;
-	int			count_param;
+	char			*resolution_x;
+	char			*resolution_y;
+	char			*tx_no;
+	char			*tx_so;
+	char			*tx_ea;
+	char			*tx_we;
+	char			*tx_sprite;
+	unsigned int	f_color;
+	unsigned int	c_color;
+	int				count_param;
 }				t_config;
 
 typedef struct	s_img {

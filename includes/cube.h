@@ -31,7 +31,7 @@ char	*ft_strdup_till_char(char *s, char c, int start);
 int		c_in_s(char c, char *s);
 void	ft_bzero(void *s, size_t n);
 char	*ft_strjoin_free(char *s1, char *s2);
-int		ft_strlen(char *s);
+size_t	ft_strlen(const char *s);
 char	*ft_strdup(const char *s);
 void	free_2d_string(char **s);
 void	free_2d_array(int **array, int num_lines);
@@ -39,5 +39,6 @@ int		**malloc_2d_array(int **array, int size, int lines);
 int		ft_isdigit(int c);
 int		ft_isalpha(int c);
 char	*ft_str_append(char *s, char c);
-int		*ft_lite_atoi(const char *s);
+int		ft_lite_atoi(const char *s);
+char	**ft_lite_split(char *s, char c);
 #endif
