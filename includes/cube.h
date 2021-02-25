@@ -23,6 +23,7 @@
 # define F_COLOR 0X00FFC99B
 # define FIRST_L "RNSWESFC"
 # define ALLOWED_SP " \t"
+# define HEXA "0123456789ABCDEF"
 
 void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite);
 void	bubble_sort_with_order(double *array, int *order, int size);
@@ -31,9 +32,12 @@ int		c_in_s(char c, char *s);
 void	ft_bzero(void *s, size_t n);
 char	*ft_strjoin_free(char *s1, char *s2);
 int		ft_strlen(char *s);
+char	*ft_strdup(const char *s);
 void	free_2d_string(char **s);
 void	free_2d_array(int **array, int num_lines);
 int		**malloc_2d_array(int **array, int size, int lines);
 int		ft_isdigit(int c);
 int		ft_isalpha(int c);
+char	*ft_str_append(char *s, char c);
+int		*ft_lite_atoi(const char *s);
 #endif

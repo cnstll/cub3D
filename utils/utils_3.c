@@ -38,3 +38,46 @@ char			*ft_strdup(const char *s)
 	return (dup);
 }
 
+char			*ft_str_append(char *s, char c)
+{
+	unsigned int	len;
+	char			*r;
+	int				i;
+
+	len = ft_strlen(s);
+	i = 0;
+	if (!s)
+		return (0);
+	if (!(r = (char *)malloc(sizeof(char) * (len + 2))))
+		return (0);
+	while (s[i])
+	{
+		r[i] = s[i];
+		i++;
+	}
+	r[i++] = c;
+	r[i] = '\0';
+	if ((*s))
+		free(s);
+	return (r);
+}
+
+int				*ft_lite_atoi(const char *s)	
+{
+	char	*nbr;
+	int		n;
+	int		i;
+
+	nbr = (char *)s;
+	i = 0;
+	n = 0;
+	while (nbr[i] > 47 && nbr[i] < 58)
+	{
+		if (nbr[i + 1] > 47 && nbr[i + 1] < 58)
+			n = (n + (int)(nbr[i]) % 48) * 10;
+		else
+			n = (n + (int)(nbr[i]) % 48);
+		i++;
+	}
+	return (n);
+}

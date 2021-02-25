@@ -173,7 +173,7 @@ int		map_pre_parsing(char *map)
 	return (1);
 }
 
-char **split_lines(char *lines)
+char **ft_lite_split(char *s, char c)
 {
 	char **ret;
 	int		j;
@@ -182,16 +182,16 @@ char **split_lines(char *lines)
 
 	j = 0;
 	k = 0;
-	n_lines = count_c_in_s('\n', lines);
+	n_lines = count_c_in_s(c, s);
 	ret = (char **)malloc(sizeof(char *) * (n_lines + 1));
 	if (ret == NULL)
 		return (NULL);
 	while (j < n_lines)
 	{
-		ret[j] = ft_strdup_till_char(lines, '\n', k);
-		while (lines[k] && lines[k] != '\n')
+		ret[j] = ft_strdup_till_char(s, c, k);
+		while (s[k] && s[k] != c)
 			k++;
-		if (lines[k] == '\n')
+		if (s[k] == c)
 			k++;
 		j++;
 	}
@@ -207,6 +207,7 @@ int	window_resolution()
 
 int valid_elements_pair(char e1, char e2)
 {
+	config->count_param++;
 	if (c_in_s(e1, "RFC") == 1 && e2 == ' ')
 		return (1);
 	else if (e1 == 'S' && (e2 == ' ' || e2 == 'O'))
@@ -238,7 +239,6 @@ int	check_path_file(char *p, int start)
 
 void	copy_path_file(char *p, t_config *config, int start)
 {
-	config->count_param++;
 	if (p[0] == 'E' && p[1] == 'A')
 		config->tx_ea = ft_strdup(p + start);
 	else if (p[0] == 'S' && p[1] == 'O')
@@ -251,6 +251,81 @@ void	copy_path_file(char *p, t_config *config, int start)
 		config->tx_sprite = ft_strdup(p + start);
 	else
 		return ;
+}
+
+int	check_res(char *p, int start)
+{
+	int j;
+	int space;
+
+	j = start;
+	space = 0;
+	while (p[j])
+	{
+		if (ft_isdigit(p[j]) == 1 || (p[j++] == ' ' && space == 0))
+			space = 1;
+		else
+			return (-1);
+	}
+	return (1);
+	
+}
+
+void	copy_res(char *p, t_config *config, int start)
+{
+	int j;
+	
+	j = start;
+	while (ft_isdigit(p[j]) == 1)
+	{
+		config->resolution_x = ft_str_append(p + start, p[j]);
+		j++;
+	}
+	while (ft_isdigit(p[++j]) == 1)
+		config->resolution_y = ft_str_append(p + start, p[j]);
+}
+
+unsigned long rgb_to_hex(int r, int g, int b)
+{
+    unsigned long	u;
+	
+	u =  ((r & 0xFF) << 16) + ((g & 0xFF) << 8) + (b & 0xFF);
+	return (u);
+}
+
+int	check_color(char *p, int start)
+{
+	int j;
+	int space;
+
+	j = start;
+	comma = 0;
+	while (p[j])
+	{
+		if (ft_isdigit(p[j]) == 1 || (p[j++] == ',' && comma < 2))
+			comma++;
+		else
+			return (-1);
+	}
+	return (1);
+	
+}
+
+void	copy_color(char *p, t_config *config, int start)
+{
+	int	r;
+	int	g;
+	int	b;
+	char **tmp;
+
+	tmp = ft_lite_split(p, ',');
+	r = ft_lite_atoi(p[0]);
+	g = ft_lite_atoi(p[1]);
+	b = ft_lite_atoi(p[2]);
+	if (p[0] = 'F')		
+		config->f_color = rgb_to_hex(r, g, b);
+	if (p[0] = 'C')		
+		config->c_color = rgb_to_hex(r, g, b);
 }
 
 int parse_param_line(char *p, t_data *data, t_config *config)
@@ -274,9 +349,10 @@ int parse_param_line(char *p, t_data *data, t_config *config)
 			else
 				return (error_handler(-3));
 		}
-		else if(ft_isdigit(p[i]))
-			//handle reso
-			//c and f colors
+		else if(ft_isdigit(p[i]) && check_res(p, i) == 1 && p[0] = 'R')
+			copy_res(p, i);
+		else if(ft_isdigit(p[i]) && check_color(p, i) == 1)
+			copy_color(p, i);
 		else
 			return (error_handler(-3));
 	}
@@ -292,7 +368,7 @@ int	parsing_parameters(char **param, t_data *data, t_config *config)
 	{
 		if (param[i][0] == '\n')
 			i++;
-		else if (valid_elements_pair(param[i][0], param[i][1] == 1))
+		else if (valid_elements_pair(param[i][0], param[i][1] == 1) && config->count_param < 8)
 			parse_param_line(param[i], data, config);
 		else if (param[i][0] == '1' && config->count_param == 8)
 			//map!
@@ -322,7 +398,7 @@ int extract_map_from_file(char *path_file, t_data *data)
 		free(tmp);
 		return (-1);
 	}
-	map = split_lines(tmp);
+	map = ft_lite_split(tmp, '\n');
 	map_tab = malloc_2d_array(map_tab, map_max_width(map), map_max_height(map));
 	str_to_array(map, map_tab, map_max_width(map), map_max_height(map));
 	free(tmp);
@@ -339,7 +415,7 @@ int extract_config_elements(t_data *data, char *path_file)
 	tmp = file_to_str(path_file);
 	if (!tmp)
 		return (error_handler(-1));
-	param = split_lines(tmp);
+	param = ft_lite_split(tmp, '\n');
 	parsing_parameters(param, data, data->config);
 
 }

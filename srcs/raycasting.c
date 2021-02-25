@@ -43,14 +43,15 @@ int		init_window(t_data *data)
 	data->mlx = mlx_init();
 	if (data->mlx == NULL)
 		return (-1);
-	data->screen_wd = 640;
-	data->screen_ht = 480;
+	data->screen_wd = 1920;
+	data->screen_ht = 1080;
 	data->win =
 		mlx_new_window(data->mlx, data->screen_wd, data->screen_ht, "cub3D");
 	if (data->win == NULL)
 		return (-1);
-	data->buffer = (int **)malloc(sizeof(int *) * data->screen_ht);
-	malloc_2d_array(data->buffer, data->screen_wd, data->screen_ht);
+	data->buffer = NULL;
+	data->buffer =
+		malloc_2d_array(data->buffer, data->screen_wd, data->screen_ht);
 	return (1);
 }
 
@@ -662,7 +663,7 @@ int main(void)
 	render_next_frame(data);
 	mlx_hook(data->win, 2, 1L<<0, &key_press, data);
 	mlx_hook(data->win, 3, 1L<<1, &key_release, data);
-	mlx_hook(data->win, 33, 1L<<17, &clic_to_close, data);
+//	mlx_hook(data->win, 33, 1L<<17, &clic_to_close, data);
 	mlx_loop_hook(data->mlx, &handle_player_move, data);
 	mlx_loop(data->mlx);
 	mlx_destroy_display(data->mlx);
