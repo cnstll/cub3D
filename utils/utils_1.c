@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/24 10:24:38 by calle             #+#    #+#             */
-/*   Updated: 2021/02/24 10:28:35 by calle            ###   ########.fr       */
+/*   Updated: 2021/02/26 19:46:08 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ char	*ft_strdup_till_char(char *s, char c, int start)
 	char	*dup;
 
 	i = start;
+	if (!s)
+		return (NULL);
 	while (s[i] != c && s[i])
 		i++;
 	size = i - start;

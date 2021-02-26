@@ -4,14 +4,18 @@ void	error_handler(int error)
 {
 	if (error < 0)
 		printf("Error\n");
-	else if (error == -1)
+	if (error == -1)
 		printf("Empty map!\n");
 	else if (error == -2)
 		printf("Inappropriate character in map\n");
 	else if (error == -3)
-		printf("Wrong game configuration\n");
+		printf("Wrong configuration parameters\n");
 	else if (error == -4)
 		printf("Empty configuration file\n");
+	else if (error == -5)
+		printf("Too many configuration parameters\n");
+	else if (error == -6)
+		printf("Configuration parameters missing\n");
 	else
 		printf("Configuration ok\n");
 }
@@ -19,8 +23,8 @@ void	error_handler(int error)
 void init_config(t_data *data)
 {
 	data->config = malloc(sizeof(t_config));
-	data->config->resolution_x = "";
-	data->config->resolution_y = "";
+	data->config->res_x = "";
+	data->config->res_y = "";
 	data->config->tx_no = "";
 	data->config->tx_so = "";
 	data->config->tx_ea = "";
@@ -33,10 +37,10 @@ void init_config(t_data *data)
 
 void	destroy_config(t_config *config)
 {
-	if (config->resolution_x[0] != '\0')
-		free(config->resolution_x);
-	if (config->resolution_y[0] != '\0')
-		free(config->resolution_y);
+	if (config->res_x[0] != '\0')
+		free(config->res_x);
+	if (config->res_y[0] != '\0')
+		free(config->res_y);
 	if (config->tx_no[0] != '\0')
 		free(config->tx_no);
 	if (config->tx_so[0] != '\0')
@@ -176,7 +180,6 @@ int		map_pre_parsing(char *map)
 
 int valid_elements_pair(char e1, char e2, t_config *config)
 {
-	config->count_param++;
 	if (c_in_s(e1, "RFC") > 0 && e2 == ' ')
 		return (1);
 	else if (e1 == 'S' && (e2 == ' ' || e2 == 'O'))
@@ -191,7 +194,7 @@ int valid_elements_pair(char e1, char e2, t_config *config)
 		return (-1);
 }
 
-int	check_path_file(char *p, int start)
+int	check_path(char *p, int start)
 {
 	int j;
 
@@ -206,20 +209,20 @@ int	check_path_file(char *p, int start)
 	return (1);
 }
 
-void	copy_path_file(char *p, t_config *config, int start)
+int	copy_path(char *p, t_config *config, int start)
 {
-	if (p[0] == 'E' && p[1] == 'A')
+	config->count_param++;
+	if (p[0] == 'E' && p[1] == 'A' && !*config->tx_ea)
 		config->tx_ea = ft_strdup(p + start);
-	else if (p[0] == 'S' && p[1] == 'O')
+	else if (p[0] == 'S' && p[1] == 'O' && !*config->tx_so)
 		config->tx_so = ft_strdup(p + start);
-	else if (p[0] == 'W' && p[1] == 'E')
+	else if (p[0] == 'W' && p[1] == 'E' && !*config->tx_we)
 		config->tx_we = ft_strdup(p + start);
-	else if (p[0] == 'N' && p[1] == 'O')
+	else if (p[0] == 'N' && p[1] == 'O' && !*config->tx_no)
 		config->tx_no = ft_strdup(p + start);
-	else if (p[0] == 'S' && p[1] == ' ')
+	else if (p[0] == 'S' && p[1] == ' ' && !*config->tx_sprite)
 		config->tx_sprite = ft_strdup(p + start);
-	else
-		return ;
+	return (0);
 }
 
 int	check_res(char *p, int start)
@@ -230,35 +233,40 @@ int	check_res(char *p, int start)
 	j = start;
 	space = 0;
 	if (p[0] != 'R')
+		return (-1);
 	while (p[j])
 	{
-		if (ft_isdigit(p[j]) == 1 || ((p[j] == ' ' && space == 0)))
-		{	
-			space = 1;
+		if (ft_isdigit(p[j]) == 1 && space < 2)
+			j++;
+		else if (p[j] == ' ' && space == 0)
+		{
+			space++;
 			j++;
 		}
 		else
 			return (-1);
 	}
 	return (1);
-	
 }
 
-void	copy_res(char *p, t_config *config, int start)
+int	copy_res(char *p, t_config *config, int start)
 {
 	int j;
-	
+
 	j = start;
 	while (ft_isdigit(p[j]) == 1)
 	{
-		config->resolution_x = ft_str_append(p + start, p[j]);
+		config->res_x = ft_str_append(config->res_x, p[j]);
 		j++;
 	}
 	while (ft_isdigit(p[++j]) == 1)
-		config->resolution_y = ft_str_append(p + start, p[j]);
+		config->res_y = ft_str_append(config->res_y, p[j]);
+	config->count_param++;
+	return (0);
 }
+
 unsigned long rgb_to_hex(int r, int g, int b)
-{   
+{
     unsigned int	u;
 
 	u = ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
@@ -272,36 +280,38 @@ int	check_color(char *p, int start)
 
 	j = start;
 	comma = 0;
-	if (p[0] != 'C' || p[0] != 'F')
+	if (p[0] != 'C' && p[0] != 'F')
 		return (-1);
 	while (p[j])
 	{
-		if (ft_isdigit(p[j]) == 1 || (p[j++] == ',' && comma < 2))
+		if (ft_isdigit(p[j]) == 1 && comma < 3)
+			j++;
+		else if (p[j++] == ',' && comma < 2)
 			comma++;
 		else
 			return (-1);
 	}
 	return (1);
-	
 }
 
-void	copy_color(char *p, t_config *config, int start)
+int	copy_color(char *p, t_config *config, int start)
 {
 	int r;
 	int g;
 	int b;
 	char **tmp;
 
-	tmp = ft_lite_split(p + start, ',');	
+	tmp = ft_lite_split(p + start, ',');
 	r = ft_lite_atoi(tmp[0]);
 	g = ft_lite_atoi(tmp[1]);
 	b = ft_lite_atoi(tmp[2]);
+	free_2d_string(tmp);
 	if (p[0] == 'F')
 		config->f_color = rgb_to_hex(r,g,b);
-	else if (p[0] == 'C')
+	if (p[0] == 'C')
 		config->c_color = rgb_to_hex(r,g,b);
-	else
-		return ;
+	config->count_param++;
+	return (0);
 }
 
 void	parse_param_line(char *p, t_config *config)
@@ -315,25 +325,46 @@ void	parse_param_line(char *p, t_config *config)
 	{
 		if (p[i] == ' ')
 			i++;
-		else if (p[i] == '.' && p[i + 1] == '/')
-		{
-			if (check_path_file(p, i + 2) == 1)
-			{
-				copy_path_file(p, config, i);
-				done = 0;
-			}
-			else
-				return (error_handler(-3));
-		}
-		else if(ft_isdigit(p[i]) && check_res(p, i) == 1)
-			copy_res(p, config, i);
-		else if(ft_isdigit(p[i]) && check_color(p, i) == 1)
-			copy_color(p, config, i);
+		else if (p[i] == '.' && p[i + 1] == '/' && check_path(p, i + 2) == 1)
+			done = copy_path(p, config, i);
+		else if(p[0] == 'R' && ft_isdigit(p[i]) && check_res(p, i) == 1)
+			done = copy_res(p, config, i);
+		else if(c_in_s(p[0], "CF") >= 0 && ft_isdigit(p[i]) && check_color(p, i) == 1)
+			done = copy_color(p, config, i);
 		else
-			return (error_handler(-3));
+			return ;
 	}
 }
 
+int check_if_map(char *line, int num_line)
+{
+	int i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != '1' && line[i] != ' ')
+			return (-2);
+		i++;
+	}
+	return (num_line);
+}
+
+int	check_parameters(t_data *data, int ret)
+{
+	if (!*config->tx_ea)
+		ret = -;
+	else if (p[0] == 'S' && p[1] == 'O' && !*config->tx_so)
+		config->tx_so = ft_strdup(p + start);
+	else if (p[0] == 'W' && p[1] == 'E' && !*config->tx_we)
+		config->tx_we = ft_strdup(p + start);
+	else if (p[0] == 'N' && p[1] == 'O' && !*config->tx_no)
+		config->tx_no = ft_strdup(p + start);
+	else if (p[0] == 'S' && p[1] == ' ' && !*config->tx_sprite)
+		config->tx_sprite = ft_strdup(p + start);
+	return (0);
+
+}
 // 8 Elements to parse before map
 int	parsing_parameters(char **param, t_config *config)
 {
@@ -344,18 +375,20 @@ int	parsing_parameters(char **param, t_config *config)
 		return (-4);
 	while (param[i])
 	{
-		if (param[i][0] == '\n')
+		if (param[i][0] == '\0')
 			i++;
-		else if (valid_elements_pair(param[i][0], param[i][1], config) && config->count_param < 8)
-			parse_param_line(param[i], config);
+		else if (config->count_param > 8)
+			return (-5);
+		else if (valid_elements_pair(param[i][0], param[i][1], config) == 1)
+			parse_param_line(param[i++], config);
 		else if (param[i][0] == '1' && config->count_param == 8)
-			i++;
+			return (i);
 		else if (param[i][0] == ' ' && config->count_param == 8)
-			i++;
+			return (check_if_map(param[i], i));
 		else
 			return (-3);
 	}
-	return (1);
+	return (0);
 }
 
 /*
@@ -386,6 +419,10 @@ int extract_map_from_file(char *path_file, t_data *data)
 	return (1);
 }*/
 
+int	parsing_map(param, data)
+{
+}
+
 int extract_config_elements(t_data *data, char *path_file)
 {
 	char	*tmp;
@@ -396,8 +433,16 @@ int extract_config_elements(t_data *data, char *path_file)
 	if (!tmp)
 		return (-1);
 	param = ft_lite_split(tmp, '\n');
+	free(tmp);
 	r = parsing_parameters(param, data->config);
-	return (r);
+	r = check_parameters(data->config, r);
+	if (r >= 0)
+		return (parsing_map(param, data));
+	else
+	{
+		free_2d_string(param);
+		return (r);
+	}
 }
 
 int main(void)
@@ -407,8 +452,15 @@ int main(void)
 	data = malloc(sizeof(t_data));
 	init_config(data);
 	error_handler(extract_config_elements(data, "./map_full_test.cub"));
-	printf("config->reso_x -- %s\n", data->config->resolution_x);
-	printf("config->reso_y -- %s\n", data->config->resolution_y);
+	printf("config->reso_x -- %s\n", data->config->res_x);
+	printf("config->reso_y -- %s\n", data->config->res_y);
+	printf("config->tx_ea -- %s\n", data->config->tx_ea);
+	printf("config->tx_no -- %s\n", data->config->tx_no);
+	printf("config->tx_we -- %s\n", data->config->tx_we);
+	printf("config->tx_so -- %s\n", data->config->tx_so);
+	printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
+	printf("config->f_color -- %x\n", data->config->f_color);
+	printf("config->c_color -- %x\n", data->config->c_color);
 	destroy_config(data->config);
 	free(data);
 	return (1);

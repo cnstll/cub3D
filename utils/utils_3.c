@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/24 15:37:53 by calle             #+#    #+#             */
-/*   Updated: 2021/02/24 15:46:40 by calle            ###   ########.fr       */
+/*   Updated: 2021/02/26 19:01:33 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ char			*ft_str_append(char *s, char c)
 	return (r);
 }
 
-int				ft_lite_atoi(const char *s)	
+int				ft_lite_atoi(const char *s)
 {
 	char	*nbr;
 	int		n;
@@ -86,10 +86,10 @@ char **ft_lite_split(char *s, char c)
 		if (s[j++] == c)
 			n_sep++;
 	j = 0;
-	ret = (char **)malloc(sizeof(char *) * (n_sep + 1));
+	ret = (char **)malloc(sizeof(char *) * (n_sep + 2));
 	if (ret == NULL)
 		return (NULL);
-	while (j < n_sep)
+	while (j <= n_sep)
 	{
 		ret[j] = ft_strdup_till_char(s, c, k);
 		while (s[k] && s[k] != c)
@@ -98,7 +98,7 @@ char **ft_lite_split(char *s, char c)
 			k++;
 		j++;
 	}
-	ret[n_sep] = 0;
+	ret[j] = 0;
 	return (ret);
 }
 
