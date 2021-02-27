@@ -15,7 +15,7 @@ void	error_handler(int error)
 	else if (error == -5)
 		printf("Too many configuration parameters\n");
 	else if (error == -6)
-		printf("Configuration parameters missing\n");
+		printf("Configuration parameter missing or wrong\n");
 	else
 		printf("Configuration ok\n");
 }
@@ -32,6 +32,8 @@ void init_config(t_data *data)
 	data->config->tx_sprite = "";
 	data->config->f_color = 0;
 	data->config->c_color = 0;
+	data->config->f_saved = 0;
+	data->config->c_saved = 0;
 	data->config->count_param = 0;
 }
 
@@ -178,7 +180,7 @@ int		map_pre_parsing(char *map)
 	return (1);
 }
 
-int valid_elements_pair(char e1, char e2, t_config *config)
+int valid_elements_pair(char e1, char e2)
 {
 	if (c_in_s(e1, "RFC") > 0 && e2 == ' ')
 		return (1);
@@ -310,6 +312,10 @@ int	copy_color(char *p, t_config *config, int start)
 		config->f_color = rgb_to_hex(r,g,b);
 	if (p[0] == 'C')
 		config->c_color = rgb_to_hex(r,g,b);
+	if (p[0] == 'F')
+		config->f_saved++;
+	if (p[0] == 'C')
+		config->c_saved++;
 	config->count_param++;
 	return (0);
 }
@@ -329,7 +335,9 @@ void	parse_param_line(char *p, t_config *config)
 			done = copy_path(p, config, i);
 		else if(p[0] == 'R' && ft_isdigit(p[i]) && check_res(p, i) == 1)
 			done = copy_res(p, config, i);
-		else if(c_in_s(p[0], "CF") >= 0 && ft_isdigit(p[i]) && check_color(p, i) == 1)
+		else if(p[0] == 'C' && ft_isdigit(p[i]) && check_color(p, i) == 1)
+			done = copy_color(p, config, i);
+		else if(p[0] == 'F' && ft_isdigit(p[i]) && check_color(p, i) == 1)
 			done = copy_color(p, config, i);
 		else
 			return ;
@@ -350,20 +358,27 @@ int check_if_map(char *line, int num_line)
 	return (num_line);
 }
 
-int	check_parameters(t_data *data, int ret)
+int	check_parameters(t_config *config, int ret)
 {
 	if (!*config->tx_ea)
-		ret = -;
-	else if (p[0] == 'S' && p[1] == 'O' && !*config->tx_so)
-		config->tx_so = ft_strdup(p + start);
-	else if (p[0] == 'W' && p[1] == 'E' && !*config->tx_we)
-		config->tx_we = ft_strdup(p + start);
-	else if (p[0] == 'N' && p[1] == 'O' && !*config->tx_no)
-		config->tx_no = ft_strdup(p + start);
-	else if (p[0] == 'S' && p[1] == ' ' && !*config->tx_sprite)
-		config->tx_sprite = ft_strdup(p + start);
-	return (0);
-
+		ret = -6;
+	else if (!*config->tx_so)
+		ret = -6;
+	else if (!*config->tx_we)
+		ret = -6;
+	else if (!*config->tx_no)
+		ret = -6;
+	else if (!*config->tx_sprite)
+		ret = -6;
+	else if (!*config->res_x)
+		ret = -6;
+	else if (!*config->res_y)
+		ret = -6;
+	else if (config->c_saved < 1)
+		ret = -6;
+	else if (config->f_saved < 1)
+		ret = -6;
+	return (ret);
 }
 // 8 Elements to parse before map
 int	parsing_parameters(char **param, t_config *config)
@@ -379,14 +394,14 @@ int	parsing_parameters(char **param, t_config *config)
 			i++;
 		else if (config->count_param > 8)
 			return (-5);
-		else if (valid_elements_pair(param[i][0], param[i][1], config) == 1)
+		else if (valid_elements_pair(param[i][0], param[i][1]) == 1)
 			parse_param_line(param[i++], config);
 		else if (param[i][0] == '1' && config->count_param == 8)
 			return (i);
 		else if (param[i][0] == ' ' && config->count_param == 8)
 			return (check_if_map(param[i], i));
 		else
-			return (-3);
+			return (check_parameters(config, -3));
 	}
 	return (0);
 }
@@ -435,7 +450,6 @@ int extract_config_elements(t_data *data, char *path_file)
 	param = ft_lite_split(tmp, '\n');
 	free(tmp);
 	r = parsing_parameters(param, data->config);
-	r = check_parameters(data->config, r);
 	if (r >= 0)
 		return (parsing_map(param, data));
 	else
@@ -451,7 +465,7 @@ int main(void)
 
 	data = malloc(sizeof(t_data));
 	init_config(data);
-	error_handler(extract_config_elements(data, "./map_full_test.cub"));
+	error_handler(extract_config_elements(data, "./map_missing_parameter.cub"));
 	printf("config->reso_x -- %s\n", data->config->res_x);
 	printf("config->reso_y -- %s\n", data->config->res_y);
 	printf("config->tx_ea -- %s\n", data->config->tx_ea);

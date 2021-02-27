@@ -11,6 +11,8 @@ typedef struct s_config {
 	char			*tx_sprite;
 	unsigned int	f_color;
 	unsigned int	c_color;
+	int				f_saved;
+	int				c_saved;
 	int				count_param;
 }				t_config;
 
