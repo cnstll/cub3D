@@ -9,13 +9,15 @@ void	error_handler(int error)
 	else if (error == -2)
 		printf("Inappropriate character in map\n");
 	else if (error == -3)
-		printf("Wrong configuration parameters\n");
+		printf("Wrong configuration\n");
 	else if (error == -4)
 		printf("Empty configuration file\n");
 	else if (error == -5)
 		printf("Too many configuration parameters\n");
 	else if (error == -6)
 		printf("Configuration parameter missing or wrong\n");
+	else if (error == -7)
+		printf("Invalid map\n");
 	else
 		printf("Configuration ok\n");
 }
@@ -164,17 +166,23 @@ int	map_max_height(char **map)
 	return (max);
 }
 
-int		map_pre_parsing(char *map)
+int		map_pre_parsing(char **map, int start)
 {
 	int i;
+	int j;
 
-	i = 0;
+	i = start;
 	if (!map)
 		return (-1);
 	while (map[i])
 	{
-		if(c_in_s(map[i], "\t 012NSEW\n") != 1)
-			return (-2);
+		j = 0;
+		while (map[i][j])
+		{		
+			if (c_in_s(map[i][j], "\t 012NSEW\n") == 0)
+				return (-2);
+			j++;
+		}
 		i++;
 	}
 	return (1);
@@ -352,9 +360,10 @@ int check_if_map(char *line, int num_line)
 	while (line[i])
 	{
 		if (line[i] != '1' && line[i] != ' ')
-			return (-2);
+			return (-7);
 		i++;
 	}
+	printf("check if map\n");
 	return (num_line);
 }
 
@@ -381,25 +390,23 @@ int	check_parameters(t_config *config, int ret)
 	return (ret);
 }
 // 8 Elements to parse before map
-int	parsing_parameters(char **param, t_config *config)
+int	parsing_parameters(char **line, t_config *config)
 {
 	int i;
 
 	i = 0;
-	if (!param[i])
+	if (!line[i])
 		return (-4);
-	while (param[i])
+	while (line[i])
 	{
-		if (param[i][0] == '\0')
+		if (line[i][0] == '\0')
 			i++;
 		else if (config->count_param > 8)
 			return (-5);
-		else if (valid_elements_pair(param[i][0], param[i][1]) == 1)
-			parse_param_line(param[i++], config);
-		else if (param[i][0] == '1' && config->count_param == 8)
-			return (i);
-		else if (param[i][0] == ' ' && config->count_param == 8)
-			return (check_if_map(param[i], i));
+		else if (valid_elements_pair(line[i][0], line[i][1]) == 1)
+			parse_param_line(line[i++], config);
+		else if (line[i][0] != '\0' && config->count_param == 8)
+			return (check_if_map(line[i], i));
 		else
 			return (check_parameters(config, -3));
 	}
@@ -434,8 +441,109 @@ int extract_map_from_file(char *path_file, t_data *data)
 	return (1);
 }*/
 
-int	parsing_map(param, data)
+int	apply_golden_rule(char **map, int i, int j)
 {
+	if (c_in_s(map[i - 1][j - 1], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i - 1][j], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i - 1][j + 1], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i][j - 1], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i][j + 1], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i + 1][j - 1], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i + 1][j], " 1") == 0)
+		return (-7); 
+	if (c_in_s(map[i + 1][j + 1], " 1") == 0)
+		return (-7); 
+	//printf("check golden rule\n");
+	//printf("i - %d <> j - %d\n", i - 9, j);
+	return (1);
+}
+
+int	check_borders(char **map, int i, int j, int start)
+{
+	printf("check border\n");
+	printf("i - %d <> j - %d\n", i - 9, j);
+	printf("map = '%c'\n", map[i][j]);
+	if (!c_in_s(map[i][j], " 1"))
+		return (-7);
+	else if (i - start == 0 && map[i][j] == ' ')
+	{
+		if (!c_in_s(map[i + 1][j - 1], " 1") && map[i + 1][j - 1])
+			return (-7);
+		if (!c_in_s(map[i + 1][j], " 1") && map[i + 1][j])
+			return (-7);
+		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
+			return (-7);
+	}
+	else if (j == 0 && map[i][j] == ' ')
+	{
+		if (!c_in_s(map[i - 1][j + 1], " 1") && map[i - 1][j + 1])
+			return (-7);
+		if (!c_in_s(map[i][j + 1], " 1") && map[i][j + 1])
+			return (-7);
+		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
+			return (-7);
+	}
+	else if ( map[i][j] && map[i][j] == ' ') 
+	return (1);
+	
+}
+
+int	is_border(char **map, int i, int j, int start)
+{
+	if (j == 0 || i - start == 0)
+		return (-1);
+	if (!map[i - 1][j - 1] || !map[i - 1][j + 1])
+		return (-1);
+	if (!map[i + 1][j - 1] || !map[i + 1][j + 1])
+		return (-1);
+	if (!map[i][j - 1] || !map[i][j + 1])
+		return (-1);
+	if (!map[i - 1][j] || !map[i + 1][j])
+		return (-1);
+	return (1);	
+}
+
+int check_map_golden_rule(char **map, int start)
+{
+	int	r;
+	int	j;
+	int	i;
+
+	i = start;
+	r = 1;
+	while (map[i] && r == 1)
+	{
+		j = 0;
+		while (map[i][j] && r == 1)
+		{
+			if (is_border(map, i, j, start) > 0 && map[i][j] == ' ')
+				r = apply_golden_rule(map, i, j);
+			else if (is_border(map, i, j, start) < 0)
+				r = check_borders(map, i, j, start);
+			j++;
+		}
+		i++;
+	}
+	return (r);	
+}
+
+int	parsing_map(char **map, t_data *data, int start)
+{
+	int	r;
+
+	r = 0;
+	r = map_pre_parsing(map, start);
+	if (r == -2)
+		return (r);
+	r = check_map_golden_rule(map, start);
+	printf("map_parsing output - %d\n", r);
+	return (r);
 }
 
 int extract_config_elements(t_data *data, char *path_file)
@@ -451,12 +559,9 @@ int extract_config_elements(t_data *data, char *path_file)
 	free(tmp);
 	r = parsing_parameters(param, data->config);
 	if (r >= 0)
-		return (parsing_map(param, data));
-	else
-	{
-		free_2d_string(param);
-		return (r);
-	}
+		r = parsing_map(param, data, r);
+	free_2d_string(param);
+	return (r);
 }
 
 int main(void)
@@ -465,7 +570,7 @@ int main(void)
 
 	data = malloc(sizeof(t_data));
 	init_config(data);
-	error_handler(extract_config_elements(data, "./map_missing_parameter.cub"));
+	error_handler(extract_config_elements(data, "./map_full_test.cub"));
 	printf("config->reso_x -- %s\n", data->config->res_x);
 	printf("config->reso_y -- %s\n", data->config->res_y);
 	printf("config->tx_ea -- %s\n", data->config->tx_ea);
