@@ -42,4 +42,5 @@ char	*ft_str_append(char *s, char c);
 int		ft_lite_atoi(const char *s);
 char	**ft_lite_split(char *s, char c);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int		set_configuration(t_data *data);
 #endif

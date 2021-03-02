@@ -39,6 +39,10 @@ void init_config(t_data *data)
 	data->config->f_saved = 0;
 	data->config->c_saved = 0;
 	data->config->count_param = 0;
+	data->config->init_dir_x = 0;
+	data->config->init_dir_y = 0;
+	data->config->init_pos_x = 0;
+	data->config->init_pos_y = 0;
 }
 
 void	destroy_config(t_config *config)
@@ -73,29 +77,57 @@ int count_c_in_s(char c, char *s)
 	return (count);
 }
 
-void str_to_array(char **src_map, int **dest_array, t_data *data, int start)
+void	init_player(char dir, int x, int y, t_config *config)
+{
+	config->init_pos_x = x;
+	config->init_pos_y = y;
+	
+	if (dir == 'N')
+	{
+		config->init_dir_x = -1;
+		config->init_dir_y = 0;
+	}
+	else if (dir == 'S')
+	{
+		config->init_dir_x = 1;
+		config->init_dir_y = 0;
+	}
+	else if (dir == 'W')
+	{
+		config->init_dir_x = 0;
+		config->init_dir_y = -1;
+	}
+	else
+	{
+		config->init_dir_x = 0;
+		config->init_dir_y = 1;
+	}
+}
+
+void str_to_array(char **src, int **dest, t_data *data, int start)
 {
 	int i;
 	int j;
 	int	max_height;
 	int	max_width;
 
-	i = start;
+	i = 0;
 	max_height = data->world_ht;
 	max_width = data->world_wd;
-	while (i < max_height - 1)
+	while (i < max_height)
 	{
 		j = 0;
 		while (j < max_width)
 		{
-			if (src_map[i][j] && c_in_s(src_map[i][j], "012") == 1)
-				dest_array[i][j] = 0;
-			else if (src_map[i][j] && c_in_s(src_map[i][j], "NSWE") == 1)
-				dest_array[i][j] = 0;
-			else if (src_map[i][j] && src_map[i][j] == ' ')
-				dest_array[i][j] = 0; 
+			if (src[i + start][j] && c_in_s(src[i + start][j], "012") == 1)
+				dest[i][j] = src[i + start][j] - '0';
+			else if (src[i + start][j] && c_in_s(src[i + start][j], "NSWE") == 1)
+			{	
+				init_player(src[i + start][j], i, j, data->config);
+				dest[i][j] = 0;
+			}
 			else
-				dest_array[i][j] = 0;
+				dest[i][j] = 1;
 			j++;
 		}
 		i++;
@@ -114,6 +146,28 @@ void print_array(int **array, int max_width, int max_height)
 		while (j < max_width)
 		{
 			printf("%d", array[i][j]);
+			if (j == max_width - 1)
+				printf("\n");
+			j++;
+		}
+		i++;
+	}
+}
+
+void print_2d_str(char **str, int start)
+{
+	int i;
+	int j;
+
+	i = start;
+	while (str[i])
+	{
+		j = 0;
+		while (str[i][j])
+		{
+			printf("%c", str[i][j]);
+			if (!str[i][j + 1])
+				printf("\n");
 			j++;
 		}
 		i++;
@@ -157,7 +211,6 @@ int		map_max_width(char **map, int start)
 		max = (int)(fmax(ft_strlen(map[i]),max));
 		i++;
 	}
-	printf("max ln - %d\n", max);
 	return (max);
 }
 
@@ -168,8 +221,7 @@ int	map_max_height(char **map, int start)
 	max = start;
 	while (map[max])
 		max++;
-	printf("max height - %d\n", max - start);
-	max -= start;
+	max = max - start - 1;
 	return (max);
 }
 
@@ -218,7 +270,7 @@ int	check_path(char *p, int start)
 	j = start;
 	while (p[j])
 	{
-		if (ft_isalpha(p[j]) == 1 || p[j] == '_')
+		if (ft_isalpha(p[j]) == 1 || p[j] == '_' || p[j] == '/' || p[j] == '.')
 			j++;
 		else
 			return (-1);
@@ -491,17 +543,18 @@ int	check_n_w(char **map, int i, int j, int start)
 		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
 			return (-7);
 	}
+	return (1);
 }
 
 int	check_borders(char **map, int i, int j, int start)
 {
-	printf("check border\n");
-	printf("i - %d <> j - %d\n", i - 9, j);
-	printf("map = '%c'\n", map[i][j]);
+	//printf("check border\n");
+	//printf("i - %d <> j - %d\n", i - 9, j);
+	//printf("map = '%c'\n", map[i][j]);
 	if (!c_in_s(map[i][j], " 1"))
 		return (-7);
 	else if ((j == 0 || i - start == 0) && map[i][j] == ' ')
-		check_n_w(map, i, j, start);
+		return (check_n_w(map, i, j, start));
 	else if (!map[i][j + 1] && map[i][j] == ' ')
 	{
 		if (!c_in_s(map[i - 1][j - 1], " 1") && map[i - 1][j - 1])
@@ -576,11 +629,11 @@ int	parsing_map(char **map, t_data *data, int start)
 		return (r);
 	data->world_wd = map_max_width(map, start);
 	data->world_ht = map_max_height(map, start);
+	printf("wd - %d <> ht - %d\n", data->world_wd,data->world_ht);
 	data->world = malloc_2d_array(data->world, data->world_wd, data->world_ht);
+//	print_2d_str(map, start);
 	str_to_array(map, data->world, data, start);
 	print_array(data->world, data->world_wd, data->world_ht);
-	free_2d_string(map);
-	free_2d_array(data->world, data->world_ht);
 	printf("\nmap_parsing output - %d\n", r);
 	return (r);
 }
@@ -612,17 +665,8 @@ int main(int argc, char *argv[])
 		data = malloc(sizeof(t_data));
 		init_config(data);
 		error_handler(extract_config_elements(data, argv[1]));
-		printf("config->reso_x -- %s\n", data->config->res_x);
-		printf("config->reso_y -- %s\n", data->config->res_y);
-		printf("config->tx_ea -- %s\n", data->config->tx_ea);
-		printf("config->tx_no -- %s\n", data->config->tx_no);
-		printf("config->tx_we -- %s\n", data->config->tx_we);
-		printf("config->tx_so -- %s\n", data->config->tx_so);
-		printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
-		printf("config->f_color -- %x\n", data->config->f_color);
-		printf("config->c_color -- %x\n", data->config->c_color);
+		set_configuration(data);
 		destroy_config(data->config);
-		free(data);
 	}
 	else if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) == 0)
 	{
@@ -632,3 +676,15 @@ int main(int argc, char *argv[])
 		error_handler(-8);
 	return (1);
 }
+
+/*
+		printf("config->reso_x -- %s\n", data->config->res_x);
+		printf("config->reso_y -- %s\n", data->config->res_y);
+		printf("config->tx_ea -- %s\n", data->config->tx_ea);
+		printf("config->tx_no -- %s\n", data->config->tx_no);
+		printf("config->tx_we -- %s\n", data->config->tx_we);
+		printf("config->tx_so -- %s\n", data->config->tx_so);
+		printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
+		printf("config->f_color -- %x\n", data->config->f_color);
+		printf("config->c_color -- %x\n", data->config->c_color);
+*/

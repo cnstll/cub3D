@@ -43,8 +43,8 @@ int		init_window(t_data *data)
 	data->mlx = mlx_init();
 	if (data->mlx == NULL)
 		return (-1);
-	data->screen_wd = 1920;
-	data->screen_ht = 1080;
+	data->screen_ht = ft_lite_atoi(data->config->res_y);
+	data->screen_wd = ft_lite_atoi(data->config->res_x);
 	data->win =
 		mlx_new_window(data->mlx, data->screen_wd, data->screen_ht, "cub3D");
 	if (data->win == NULL)
@@ -69,12 +69,12 @@ int		init_img(t_data *data)
 int		init_ray(t_data *data)
 {
 	data->ray = malloc(sizeof(t_ray));
-	data->ray->pos_x = 18;
-	data->ray->pos_y = 18;  //x and y start position
+	data->ray->pos_x = data->config->init_pos_x;
+	data->ray->pos_y = data->config->init_pos_y;
 	data->ray->ms = 0.005;
 	data->ray->rs = 0.005;
-	data->ray->dir_x = -1;
-	data->ray->dir_y = 0; //initial direction vector
+	data->ray->dir_x = data->config->init_dir_x;
+	data->ray->dir_y = data->config->init_dir_y;
 	data->ray->plane_x = 0;
 	data->ray->plane_y = 0.66; //the 2d raycaster version of camera plane
 	return (1);
@@ -84,11 +84,11 @@ int load_textures(t_data *data, t_img **textures)
 {
 	int x;
 
-	textures[0]->file_paths = "./textures/colorstone.xpm";
-	textures[1]->file_paths = "./textures/redbrick.xpm";
-	textures[2]->file_paths = "./textures/greystone.xpm";
-	textures[3]->file_paths = "./textures/wood.xpm";
-	textures[4]->file_paths = "./textures/barrel.xpm";
+	textures[0]->file_paths = ft_strdup(data->config->tx_no);
+	textures[1]->file_paths = ft_strdup(data->config->tx_so);
+	textures[2]->file_paths = ft_strdup(data->config->tx_ea);
+	textures[3]->file_paths = ft_strdup(data->config->tx_we);
+	textures[4]->file_paths = ft_strdup(data->config->tx_sprite);
 	x = 0;
 	while (x < 5)
 	{
@@ -118,22 +118,58 @@ int init_textures(t_data *data)
 	return (1);
 }
 
+int	find_sprite_num(t_data *data)
+{
+	int	r;
+	int	i;
+	int	j;
+	
+	r = 0;
+	i = 0;
+	while (i < data->world_ht)
+	{
+		j = 0;
+		while (j < data->world_wd)
+		{
+			if (data->world[i][j] == 2)
+				r++;
+			j++;
+		}
+		i++;
+	}
+	return (r);
+}
+
+void	find_sprite_pos(t_data *data, t_sprite *sprite)
+{
+	int	r;
+	int	i;
+	int	j;
+	
+	r = 0;
+	i = 0;
+	while (i < data->world_ht)
+	{
+		j = 0;
+		while (j < data->world_wd && r < sprite->num)
+		{
+			if (data->world[i][j] == 2)
+				sprite->sp[r++] = (t_sp){(double)(i), (double)(j), 4};
+			j++;
+		}
+		i++;
+	}
+}
+
 int	init_sprites(t_data *data)
 {
 	data->sprite = malloc(sizeof(t_sprite));
-	data->sprite->num = 8;
+	data->sprite->num = find_sprite_num(data);
 	data->sprite->buffer = malloc(sizeof(double) * data->screen_wd);
 	data->sprite->order = malloc(sizeof(int) * data->sprite->num);
 	data->sprite->distance = malloc(sizeof(double) * data->sprite->num);
 	data->sprite->sp = malloc(sizeof(t_sp) * data->sprite->num);
-	data->sprite->sp[0] = (t_sp){21.5, 1.5, 4};
-	data->sprite->sp[1] = (t_sp){15.5, 1.8, 4};
-	data->sprite->sp[2] = (t_sp){16.0, 1.2, 4};
-	data->sprite->sp[3] = (t_sp){16.2, 2.5, 4};
-	data->sprite->sp[4] = (t_sp){3.5, 15.5, 4};
-	data->sprite->sp[5] = (t_sp){9.5, 15.1, 4};
-	data->sprite->sp[6] = (t_sp){10.5, 15.8, 4};
-	data->sprite->sp[7] = (t_sp){11.5, 1.5, 4};
+	find_sprite_pos(data, data->sprite);
 	return (1);
 }
 
@@ -171,46 +207,6 @@ int	init_inputs(t_data *data)
 	data->inputs->key_right = 0;
 	data->inputs->key_esc = 0;
 	return (1);
-}
-
-void init_array(int src_array[WORLD_WD][WORLD_HT], int dest_array[WORLD_WD][WORLD_HT])
-{
-	int x;
-	int y;
-
-	x = 0;
-	while (x < 24)
-	{
-		y = 0;
-		while (y < 24)
-		{
-			dest_array[x][y] = src_array[x][y];
-			y++;
-		}
-		x++;
-	}
-}
-
-void print_array(int src_array[WORLD_WD][WORLD_HT])
-{
-	int x;
-	int y;
-
-	x = 0;
-	while (x < 24)
-	{
-		y = 0;
-		while (y < 24)
-		{
-			printf("%d", src_array[x][y]);
-			if (y != 23)
-				printf(" ");
-			else
-				printf("\n");
-			y++;
-		}
-		x++;
-	}
 }
 
 int draw_buffer(int **buffer, t_data *data)
@@ -277,7 +273,7 @@ int	put_ceilling(t_data *data, int stripes, int wall_top)
 
 	i = 0;
 	while (i < wall_top - 1)
-		data->buffer[i++][stripes] = C_COLOR;
+		data->buffer[i++][stripes] = data->config->c_color;
 	return (1);
 }
 
@@ -287,7 +283,7 @@ int	put_floor(t_data *data, int stripes, int wall_bot)
 
 	i = wall_bot + 1;
 	while (i < data->screen_ht)
-		data->buffer[i++][stripes] = F_COLOR;
+		data->buffer[i++][stripes] = data->config->f_color;
 	return (1);
 }
 
@@ -462,7 +458,7 @@ int		render_next_frame(t_data *data)
 	return (1);
 }
 
-void	move_up(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+void	move_up(t_ray *ray, int **world)
 {
 	if(world[(int)(ray->pos_x + ray->dir_x * ray->ms)][(int)(ray->pos_y)] == 0)
 		ray->pos_x += ray->dir_x * ray->ms;
@@ -470,7 +466,7 @@ void	move_up(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 		ray->pos_y += ray->dir_y * ray->ms;
 }
 
-void	move_down(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+void	move_down(t_ray *ray, int **world)
 {
 	if(world[(int)(ray->pos_x - ray->dir_x * ray->ms)][(int)(ray->pos_y)] == 0)
 		ray->pos_x -= ray->dir_x * ray->ms;
@@ -478,7 +474,7 @@ void	move_down(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 		ray->pos_y -= ray->dir_y * ray->ms;
 }
 
-void	move_left(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+void	move_left(t_ray *ray, int **world)
 {
 	if(world[(int)(ray->pos_x - ray->plane_x * ray->ms)][(int)(ray->pos_y)] == 0)
 		ray->pos_x -= ray->plane_x * ray->ms;
@@ -486,7 +482,7 @@ void	move_left(t_ray *ray, int world[WORLD_WD][WORLD_HT])
 		ray->pos_y -= ray->plane_y * ray->ms;
 }
 
-void	move_right(t_ray *ray, int world[WORLD_WD][WORLD_HT])
+void	move_right(t_ray *ray, int **world)
 {
 	if(world[(int)(ray->pos_x + ray->plane_x * ray->ms)][(int)(ray->pos_y)] == 0)
 		ray->pos_x += ray->plane_x * ray->ms;
@@ -620,40 +616,9 @@ int		clic_to_close(int clic, t_data *data)
 	return(1);
 }
 
-int main(void)
+int set_configuration(t_data *data)
 {
-	int  world[WORLD_WD][WORLD_HT] = {
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-		{1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
-		{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-	};
-	t_data *data;
-	data = malloc(sizeof(t_data));
-	if (data == NULL)
-		return (-1);
 	init_window(data);
-	init_array(world, data->world);
 	//print_array(data->world);
 	init_img(data);
 	init_ray(data);

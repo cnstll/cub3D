@@ -51,6 +51,8 @@ void	bubble_sort_with_order(double *array, int *order, int size)
 				done--;
 			i++;
 		}
+		if (i == 0)
+			done = 0;
 	}
 }
 

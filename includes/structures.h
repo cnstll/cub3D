@@ -14,6 +14,10 @@ typedef struct s_config {
 	int				f_saved;
 	int				c_saved;
 	int				count_param;
+	int				init_dir_x;
+	int				init_dir_y;
+	int				init_pos_x;
+	int				init_pos_y;
 }				t_config;
 
 typedef struct	s_img {

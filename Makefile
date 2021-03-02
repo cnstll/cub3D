@@ -4,7 +4,9 @@ SRCS = srcs/raycasting.c \
        srcs/sprite_casting.c\
        srcs/sprite_sorter.c \
 		utils/utils_1.c \
-		utils/utils_2.c
+		utils/utils_2.c \
+		utils/utils_3.c \
+		extract_map.c
 
 OBJS = $(SRCS:.c=.o)
 

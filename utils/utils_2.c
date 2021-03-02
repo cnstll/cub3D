@@ -18,7 +18,7 @@ void	free_2d_string(char **s)
 	i = 0;
 	while (s[i])
 		free(s[i++]);
-	free(s[i]);
+	//free(s[i]);
 	free(s);
 }
 
