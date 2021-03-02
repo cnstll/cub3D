@@ -5,7 +5,7 @@ void	error_handler(int error)
 	if (error < 0)
 		printf("Error\n");
 	if (error == -1)
-		printf("Empty map!\n");
+		printf("Something went wrong with the configuration/map file\n");
 	else if (error == -2)
 		printf("Inappropriate character in map\n");
 	else if (error == -3)
@@ -18,6 +18,8 @@ void	error_handler(int error)
 		printf("Configuration parameter missing or wrong\n");
 	else if (error == -7)
 		printf("Invalid map\n");
+	else if (error == -8)
+		printf("No input file\n");
 	else
 		printf("Configuration ok\n");
 }
@@ -71,21 +73,29 @@ int count_c_in_s(char c, char *s)
 	return (count);
 }
 
-void str_to_array(char **src_map, int **dest_array, int max_width, int max_height)
+void str_to_array(char **src_map, int **dest_array, t_data *data, int start)
 {
 	int i;
 	int j;
+	int	max_height;
+	int	max_width;
 
-	i = 0;
+	i = start;
+	max_height = data->world_ht;
+	max_width = data->world_wd;
 	while (i < max_height - 1)
 	{
 		j = 0;
 		while (j < max_width)
 		{
-			if (src_map[i][j])
-				dest_array[i][j] = src_map[i][j];
+			if (src_map[i][j] && c_in_s(src_map[i][j], "012") == 1)
+				dest_array[i][j] = 0;
+			else if (src_map[i][j] && c_in_s(src_map[i][j], "NSWE") == 1)
+				dest_array[i][j] = 0;
+			else if (src_map[i][j] && src_map[i][j] == ' ')
+				dest_array[i][j] = 0; 
 			else
-				dest_array[i][j] = ' ';
+				dest_array[i][j] = 0;
 			j++;
 		}
 		i++;
@@ -94,23 +104,19 @@ void str_to_array(char **src_map, int **dest_array, int max_width, int max_heigh
 
 void print_array(int **array, int max_width, int max_height)
 {
-	int x;
-	int y;
+	int i;
+	int j;
 
-	x = 0;
-	while (x < max_height)
+	i = 0;
+	while (i < max_height)
 	{
-		y = 0;
-		while (y < max_width)
+		j = 0;
+		while (j < max_width)
 		{
-			printf("%d", array[x][y]);
-			if (y != 23)
-				printf(" ");
-			else
-				printf("\n");
-			y++;
+			printf("%d", array[i][j]);
+			j++;
 		}
-		x++;
+		i++;
 	}
 }
 
@@ -139,13 +145,13 @@ char *file_to_str(char *path_file)
 	return (tmp);
 }
 
-int		map_max_width(char **map)
+int		map_max_width(char **map, int start)
 {
 	int	max;
 	int	i;
 
 	max = 0;
-	i = 0;
+	i = start;
 	while (map[i])
 	{
 		max = (int)(fmax(ft_strlen(map[i]),max));
@@ -155,14 +161,15 @@ int		map_max_width(char **map)
 	return (max);
 }
 
-int	map_max_height(char **map)
+int	map_max_height(char **map, int start)
 {
 	int	max;
 
-	max = 0;
+	max = start;
 	while (map[max])
 		max++;
-	printf("max height - %d\n", max);
+	printf("max height - %d\n", max - start);
+	max -= start;
 	return (max);
 }
 
@@ -464,14 +471,9 @@ int	apply_golden_rule(char **map, int i, int j)
 	return (1);
 }
 
-int	check_borders(char **map, int i, int j, int start)
+int	check_n_w(char **map, int i, int j, int start)
 {
-	printf("check border\n");
-	printf("i - %d <> j - %d\n", i - 9, j);
-	printf("map = '%c'\n", map[i][j]);
-	if (!c_in_s(map[i][j], " 1"))
-		return (-7);
-	else if (i - start == 0 && map[i][j] == ' ')
+	if (i - start == 0 && map[i][j] == ' ')
 	{
 		if (!c_in_s(map[i + 1][j - 1], " 1") && map[i + 1][j - 1])
 			return (-7);
@@ -489,7 +491,35 @@ int	check_borders(char **map, int i, int j, int start)
 		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
 			return (-7);
 	}
-	else if ( map[i][j] && map[i][j] == ' ') 
+}
+
+int	check_borders(char **map, int i, int j, int start)
+{
+	printf("check border\n");
+	printf("i - %d <> j - %d\n", i - 9, j);
+	printf("map = '%c'\n", map[i][j]);
+	if (!c_in_s(map[i][j], " 1"))
+		return (-7);
+	else if ((j == 0 || i - start == 0) && map[i][j] == ' ')
+		check_n_w(map, i, j, start);
+	else if (!map[i][j + 1] && map[i][j] == ' ')
+	{
+		if (!c_in_s(map[i - 1][j - 1], " 1") && map[i - 1][j - 1])
+			return (-7);
+		if (!c_in_s(map[i][j - 1], " 1") && map[i][j - 1])
+			return (-7);
+		if (!c_in_s(map[i + 1][j - 1], " 1") && map[i + 1][j - 1])
+			return (-7);
+	}		
+	else if (!map[i + 1][j] && map[i][j] == ' ')
+	{
+		if (!c_in_s(map[i - 1][j - 1], " 1") && map[i - 1][j - 1])
+			return (-7);
+		if (!c_in_s(map[i - 1][j], " 1") && map[i - 1][j])
+			return (-7);
+		if (!c_in_s(map[i - 1][j + 1], " 1") && map[i - 1][j + 1])
+			return (-7);
+	}		
 	return (1);
 	
 }
@@ -536,13 +566,22 @@ int check_map_golden_rule(char **map, int start)
 int	parsing_map(char **map, t_data *data, int start)
 {
 	int	r;
-
+	
 	r = 0;
 	r = map_pre_parsing(map, start);
 	if (r == -2)
 		return (r);
 	r = check_map_golden_rule(map, start);
-	printf("map_parsing output - %d\n", r);
+	if (r == -7)
+		return (r);
+	data->world_wd = map_max_width(map, start);
+	data->world_ht = map_max_height(map, start);
+	data->world = malloc_2d_array(data->world, data->world_wd, data->world_ht);
+	str_to_array(map, data->world, data, start);
+	print_array(data->world, data->world_wd, data->world_ht);
+	free_2d_string(map);
+	free_2d_array(data->world, data->world_ht);
+	printf("\nmap_parsing output - %d\n", r);
 	return (r);
 }
 
@@ -564,23 +603,32 @@ int extract_config_elements(t_data *data, char *path_file)
 	return (r);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	t_data *data;
 
-	data = malloc(sizeof(t_data));
-	init_config(data);
-	error_handler(extract_config_elements(data, "./map_full_test.cub"));
-	printf("config->reso_x -- %s\n", data->config->res_x);
-	printf("config->reso_y -- %s\n", data->config->res_y);
-	printf("config->tx_ea -- %s\n", data->config->tx_ea);
-	printf("config->tx_no -- %s\n", data->config->tx_no);
-	printf("config->tx_we -- %s\n", data->config->tx_we);
-	printf("config->tx_so -- %s\n", data->config->tx_so);
-	printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
-	printf("config->f_color -- %x\n", data->config->f_color);
-	printf("config->c_color -- %x\n", data->config->c_color);
-	destroy_config(data->config);
-	free(data);
+	if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) != 0)
+	{
+		data = malloc(sizeof(t_data));
+		init_config(data);
+		error_handler(extract_config_elements(data, argv[1]));
+		printf("config->reso_x -- %s\n", data->config->res_x);
+		printf("config->reso_y -- %s\n", data->config->res_y);
+		printf("config->tx_ea -- %s\n", data->config->tx_ea);
+		printf("config->tx_no -- %s\n", data->config->tx_no);
+		printf("config->tx_we -- %s\n", data->config->tx_we);
+		printf("config->tx_so -- %s\n", data->config->tx_so);
+		printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
+		printf("config->f_color -- %x\n", data->config->f_color);
+		printf("config->c_color -- %x\n", data->config->c_color);
+		destroy_config(data->config);
+		free(data);
+	}
+	else if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) == 0)
+	{
+		printf("yey I saved an Image\n");
+	}
+	else
+		error_handler(-8);
 	return (1);
 }

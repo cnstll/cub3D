@@ -86,7 +86,9 @@ typedef struct  s_data {
 	void		*win;
 	int			screen_ht;
 	int			screen_wd;
-	int			world[24][24];
+	int			**world;
+	int			world_wd;
+	int			world_ht;
 	int			**buffer;
 	t_ray		*ray;
 	t_img		*img;
