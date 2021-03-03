@@ -66,6 +66,8 @@ int		c_in_s(char c, char *s)
 	int		i;
 
 	i = 0;
+	if (!c)
+		return (0);
 	while (s && s[i])
 		if (s[i++] == c)
 			return (1);
@@ -88,7 +90,7 @@ char	*ft_strdup_till_char(char *s, char c, int start)
 	if (dup == NULL)
 		return (NULL);
 	i = 0;
-	while (i < size && s[i])
+	while (s[start] && i < size)
 		dup[i++] = s[start++];
 	dup[i] = '\0';
 	return (dup);

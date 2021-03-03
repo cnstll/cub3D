@@ -12,20 +12,19 @@
 
 #include "../includes/cube.h"
 
-static void	sort_sprites(t_ray *ray, t_sprite *sprite)
+static void	sort_sprites(t_data *data, t_ray *ray, t_sprite *sprite)
 {
 	int i;
 
 	i = 0;
 	while(i < sprite->num)
 	{
-		sprite->order[i] = i;
 		sprite->distance[i] = ((ray->pos_x - sprite->sp[i].x)
 			* (ray->pos_x - sprite->sp[i].x) + (ray->pos_y - sprite->sp[i].y)
 			* (ray->pos_y - sprite->sp[i].y));
 		i++;
 	}
-	bubble_sort_with_order(sprite->distance, sprite->order, sprite->num);
+	bubble_sort(data->sprite, sprite->distance, sprite->num);
 }
 
 static void	put_sprite_stripes(t_data *data, t_sprite *sprite, int stripe)
@@ -91,11 +90,11 @@ void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite)
 
 	i = 0;
 	w =  data->screen_wd;
-	sort_sprites(ray, sprite);
+	sort_sprites(data, ray, sprite);
 	while(i < sprite->num)
 	{
-		sprite->x = sprite->sp[sprite->order[i]].x - ray->pos_x;
-		sprite->y = sprite->sp[sprite->order[i]].y - ray->pos_y;
+		sprite->x = sprite->sp[i].x - ray->pos_x;
+		sprite->y = sprite->sp[i].y - ray->pos_y;
 		sprite->invert =
 			1.0 / (ray->plane_x * ray->dir_y - ray->dir_x * ray->plane_y);
 		sprite->transfo_x =

@@ -12,15 +12,6 @@
 
 #include "../includes/cube.h"
 
-static void	swap_int(int *a, int *b)
-{
-	int tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
 static void	swap_double(double *a, double *b)
 {
 	double tmp;
@@ -30,7 +21,16 @@ static void	swap_double(double *a, double *b)
 	*b = tmp;
 }
 
-void	bubble_sort_with_order(double *array, int *order, int size)
+static void	swap_sp(t_sp *a, t_sp *b)
+{
+	t_sp tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+
+void	bubble_sort(t_sprite *sprite, double *array, int size)
 {
 	int i;
 	int	done;
@@ -44,7 +44,7 @@ void	bubble_sort_with_order(double *array, int *order, int size)
 			if (array[i] < array[i + 1])
 			{
 				swap_double(&array[i], &array[i + 1]);
-				swap_int(&order[i], &order[i + 1]);
+				swap_sp(&sprite->sp[i], &sprite->sp[i + 1]);
 				done++;
 			}
 			else if (array[i] > array[i + 1])

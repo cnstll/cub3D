@@ -22,7 +22,6 @@
 void	destroy_sprites(t_data *data)
 {
 	free(data->sprite->buffer);
-	free(data->sprite->order);
 	free(data->sprite->distance);
 	free(data->sprite->sp);
 	free(data->sprite);
@@ -71,12 +70,12 @@ int		init_ray(t_data *data)
 	data->ray = malloc(sizeof(t_ray));
 	data->ray->pos_x = data->config->init_pos_x;
 	data->ray->pos_y = data->config->init_pos_y;
-	data->ray->ms = 0.005;
-	data->ray->rs = 0.005;
+	data->ray->ms = 0.01;
+	data->ray->rs = 0.01;
 	data->ray->dir_x = data->config->init_dir_x;
 	data->ray->dir_y = data->config->init_dir_y;
-	data->ray->plane_x = 0;
-	data->ray->plane_y = 0.66; //the 2d raycaster version of camera plane
+	data->ray->plane_x = data->config->init_plane_x;
+	data->ray->plane_y = data->config->init_plane_y;
 	return (1);
 }
 
@@ -154,7 +153,7 @@ void	find_sprite_pos(t_data *data, t_sprite *sprite)
 		while (j < data->world_wd && r < sprite->num)
 		{
 			if (data->world[i][j] == 2)
-				sprite->sp[r++] = (t_sp){(double)(i), (double)(j), 4};
+				sprite->sp[r++] = (t_sp){(double)(i) + 0.5, (double)(j) + 0.5, 4};
 			j++;
 		}
 		i++;
@@ -166,7 +165,7 @@ int	init_sprites(t_data *data)
 	data->sprite = malloc(sizeof(t_sprite));
 	data->sprite->num = find_sprite_num(data);
 	data->sprite->buffer = malloc(sizeof(double) * data->screen_wd);
-	data->sprite->order = malloc(sizeof(int) * data->sprite->num);
+	//data->sprite->order = malloc(sizeof(int) * data->sprite->num);
 	data->sprite->distance = malloc(sizeof(double) * data->sprite->num);
 	data->sprite->sp = malloc(sizeof(t_sp) * data->sprite->num);
 	find_sprite_pos(data, data->sprite);
@@ -187,11 +186,9 @@ int	destroy_textures(t_data *data)
 	while (x < 5)
 	{
 		mlx_destroy_image(data->mlx, data->textures[x]->img);
-		x++;
-	}
-	x = 0;
-	while (x < 5)
+		free(data->textures[x]->file_paths);
 		free(data->textures[x++]);
+	}
 	free(data->textures);
 	return (1);
 }
@@ -373,7 +370,7 @@ int cast_img(t_data *data)
 				side = 1;
 			}
 			//Check if ray has hit a wall
-			if (data->world[map_x][map_y] > 0)
+			if (data->world[map_x][map_y] && data->world[map_x][map_y] == 1)
 				hit = 1;
 		}
 		//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
@@ -432,12 +429,9 @@ int cast_img(t_data *data)
 		}
 		put_ceilling(data, stripes, draw_start);
 		put_floor(data, stripes, draw_end);
-		//draw the pixels of the stripe as a vertical line
-		//put_stripes(data, stripes, draw_start, draw_end, color);
 		data->sprite->buffer[stripes] = wall_dist;
 		stripes++;
 	}
-	//print_buffer(buffer, data);
 	handle_sprites(data, data->ray, data->sprite);
 	draw_buffer(data->buffer, data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
@@ -450,10 +444,6 @@ int		render_next_frame(t_data *data)
 	mlx_destroy_image(data->mlx, data->img->img);
 	free(data->img);
 	init_img(data);
-	//data->img->img = mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
-	//memcpy(data->img[0].addr, data->img[1].addr, data->img[1].line_len * WINDOW_HEIGHT);
-	//	data->img->addr = (int *)mlx_get_data_addr(
-	//data->img->img, &data->img->bpp, &data->img->line_len, &data->img->endian);
 	cast_img(data);
 	return (1);
 }

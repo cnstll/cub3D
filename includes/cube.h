@@ -27,6 +27,7 @@
 
 void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite);
 void	bubble_sort_with_order(double *array, int *order, int size);
+void	bubble_sort(t_sprite *sprite, double *array, int size);
 char	*ft_strdup_till_char(char *s, char c, int start);
 int		c_in_s(char c, char *s);
 void	ft_bzero(void *s, size_t n);

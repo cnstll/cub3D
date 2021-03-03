@@ -39,8 +39,10 @@ void init_config(t_data *data)
 	data->config->f_saved = 0;
 	data->config->c_saved = 0;
 	data->config->count_param = 0;
-	data->config->init_dir_x = 0;
+	data->config->init_dir_x = -1;
 	data->config->init_dir_y = 0;
+	data->config->init_plane_x = 0;
+	data->config->init_plane_y = 0.66;
 	data->config->init_pos_x = 0;
 	data->config->init_pos_y = 0;
 }
@@ -77,30 +79,38 @@ int count_c_in_s(char c, char *s)
 	return (count);
 }
 
+void	init_player_dir(t_config *config, double rot)
+{
+	double old_dir_x;
+	double old_plane_x;
+
+	old_dir_x = config->init_dir_x;
+	config->init_dir_x = config->init_dir_x * cos(rot) - config->init_dir_y * sin(rot);
+	config->init_dir_y = old_dir_x * sin(rot) + config->init_dir_y * cos(-rot);
+	old_plane_x = config->init_plane_x;
+	config->init_plane_x = config->init_plane_x * cos(rot) - config->init_plane_y * sin(rot);
+	config->init_plane_y = old_plane_x * sin(rot) + config->init_plane_y * cos(rot);
+
+}
+
 void	init_player(char dir, int x, int y, t_config *config)
 {
 	config->init_pos_x = x;
 	config->init_pos_y = y;
-	
+
 	if (dir == 'N')
-	{
-		config->init_dir_x = -1;
-		config->init_dir_y = 0;
-	}
+		;	
 	else if (dir == 'S')
 	{
-		config->init_dir_x = 1;
-		config->init_dir_y = 0;
+		init_player_dir(config, M_PI);
 	}
 	else if (dir == 'W')
 	{
-		config->init_dir_x = 0;
-		config->init_dir_y = -1;
+		init_player_dir(config, M_PI/2);
 	}
 	else
 	{
-		config->init_dir_x = 0;
-		config->init_dir_y = 1;
+		init_player_dir(config, 3 * M_PI/2);
 	}
 }
 
@@ -117,7 +127,7 @@ void str_to_array(char **src, int **dest, t_data *data, int start)
 	while (i < max_height)
 	{
 		j = 0;
-		while (j < max_width)
+		while (src[i + start][j] && j < max_width)
 		{
 			if (src[i + start][j] && c_in_s(src[i + start][j], "012") == 1)
 				dest[i][j] = src[i + start][j] - '0';
@@ -472,34 +482,6 @@ int	parsing_parameters(char **line, t_config *config)
 	return (0);
 }
 
-/*
-int extract_map_from_file(char *path_file, t_data *data)
-{
-	char	*tmp;
-	char	**map;
-	int		**map_tab;
-	//int		r;
-
-	//r = 0;
-	map_tab = NULL;
-	tmp = file_to_str(path_file);
-	if (!tmp)
-		return (error_handler(-1));
-	r = pre_parsing(tmp);
-	if (r < 0)
-	{
-		free(tmp);
-		return (-1);
-	}
-	map = ft_lite_split(tmp, '\n');
-	map_tab = malloc_2d_array(map_tab, map_max_width(map), map_max_height(map));
-	str_to_array(map, map_tab, map_max_width(map), map_max_height(map));
-	free(tmp);
-	free_2d_string(map);
-	free_2d_array(map_tab, map_max_height(map));
-	return (1);
-}*/
-
 int	apply_golden_rule(char **map, int i, int j)
 {
 	if (c_in_s(map[i - 1][j - 1], " 1") == 0)
@@ -527,20 +509,20 @@ int	check_n_w(char **map, int i, int j, int start)
 {
 	if (i - start == 0 && map[i][j] == ' ')
 	{
-		if (!c_in_s(map[i + 1][j - 1], " 1") && map[i + 1][j - 1])
+		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i + 1][j], " 1") && map[i + 1][j])
+		if (map[i + 1][j] && !c_in_s(map[i + 1][j], " 1"))
 			return (-7);
-		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
+		if (map[i + 1][j + 1] && !c_in_s(map[i + 1][j + 1], " 1"))
 			return (-7);
 	}
 	else if (j == 0 && map[i][j] == ' ')
 	{
-		if (!c_in_s(map[i - 1][j + 1], " 1") && map[i - 1][j + 1])
+		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i][j + 1], " 1") && map[i][j + 1])
+		if (map[i][j + 1] && !c_in_s(map[i][j + 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i + 1][j + 1], " 1") && map[i + 1][j + 1])
+		if (map[i + 1][j + 1] && !c_in_s(map[i + 1][j + 1], " 1"))
 			return (-7);
 	}
 	return (1);
@@ -557,24 +539,23 @@ int	check_borders(char **map, int i, int j, int start)
 		return (check_n_w(map, i, j, start));
 	else if (!map[i][j + 1] && map[i][j] == ' ')
 	{
-		if (!c_in_s(map[i - 1][j - 1], " 1") && map[i - 1][j - 1])
+		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i][j - 1], " 1") && map[i][j - 1])
+		if (map[i][j - 1] && !c_in_s(map[i][j - 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i + 1][j - 1], " 1") && map[i + 1][j - 1])
+		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
 			return (-7);
 	}		
 	else if (!map[i + 1][j] && map[i][j] == ' ')
 	{
-		if (!c_in_s(map[i - 1][j - 1], " 1") && map[i - 1][j - 1])
+		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
 			return (-7);
-		if (!c_in_s(map[i - 1][j], " 1") && map[i - 1][j])
+		if (map[i - 1][j] && !c_in_s(map[i - 1][j], " 1"))
 			return (-7);
-		if (!c_in_s(map[i - 1][j + 1], " 1") && map[i - 1][j + 1])
+		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
 			return (-7);
 	}		
 	return (1);
-	
 }
 
 int	is_border(char **map, int i, int j, int start)
@@ -629,9 +610,7 @@ int	parsing_map(char **map, t_data *data, int start)
 		return (r);
 	data->world_wd = map_max_width(map, start);
 	data->world_ht = map_max_height(map, start);
-	printf("wd - %d <> ht - %d\n", data->world_wd,data->world_ht);
 	data->world = malloc_2d_array(data->world, data->world_wd, data->world_ht);
-//	print_2d_str(map, start);
 	str_to_array(map, data->world, data, start);
 	print_array(data->world, data->world_wd, data->world_ht);
 	printf("\nmap_parsing output - %d\n", r);
@@ -653,19 +632,23 @@ int extract_config_elements(t_data *data, char *path_file)
 	if (r >= 0)
 		r = parsing_map(param, data, r);
 	free_2d_string(param);
+	error_handler(r);
 	return (r);
 }
 
 int main(int argc, char *argv[])
 {
-	t_data *data;
+	t_data	*data;
+	int		r;
 
 	if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) != 0)
 	{
+		r = 0;
 		data = malloc(sizeof(t_data));
 		init_config(data);
-		error_handler(extract_config_elements(data, argv[1]));
-		set_configuration(data);
+		r = extract_config_elements(data, argv[1]);
+		if (r >= 0)
+			set_configuration(data);
 		destroy_config(data->config);
 	}
 	else if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) == 0)
@@ -676,15 +659,3 @@ int main(int argc, char *argv[])
 		error_handler(-8);
 	return (1);
 }
-
-/*
-		printf("config->reso_x -- %s\n", data->config->res_x);
-		printf("config->reso_y -- %s\n", data->config->res_y);
-		printf("config->tx_ea -- %s\n", data->config->tx_ea);
-		printf("config->tx_no -- %s\n", data->config->tx_no);
-		printf("config->tx_we -- %s\n", data->config->tx_we);
-		printf("config->tx_so -- %s\n", data->config->tx_so);
-		printf("config->tx_sprite -- %s\n", data->config->tx_sprite);
-		printf("config->f_color -- %x\n", data->config->f_color);
-		printf("config->c_color -- %x\n", data->config->c_color);
-*/
