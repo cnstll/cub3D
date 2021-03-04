@@ -38,6 +38,8 @@ static void	put_sprite_stripes(t_data *data, t_sprite *sprite, int stripe)
 	{
 		d = y * 256 - data->screen_ht * 128 + sprite->height * 128;
 		sprite->tx_y = ((d * TEXTR_HT) / sprite->height) / 256;
+		if (sprite->tx_y < 0)
+			sprite->tx_y = fabs(sprite->tx_y);
 		color =
 			data->textures[4]->addr[TEXTR_WD * sprite->tx_y + sprite->tx_x];
 		if((color & 0x00FFFFFF) != 0)

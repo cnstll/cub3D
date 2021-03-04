@@ -7,15 +7,15 @@ void	error_handler(int error)
 	if (error == -1)
 		printf("Something went wrong with the configuration/map file\n");
 	else if (error == -2)
-		printf("Inappropriate character in map\n");
+		printf("Invalid character in map\n");
 	else if (error == -3)
-		printf("Wrong configuration\n");
+		printf("Invalid configuration\n");
 	else if (error == -4)
 		printf("Empty configuration file\n");
 	else if (error == -5)
 		printf("Too many configuration parameters\n");
 	else if (error == -6)
-		printf("Configuration parameter missing or wrong\n");
+		printf("Configuration parameter missing or invalid\n");
 	else if (error == -7)
 		printf("Invalid map\n");
 	else if (error == -8)
@@ -239,8 +239,10 @@ int		map_pre_parsing(char **map, int start)
 {
 	int i;
 	int j;
+	int num_of_init_pos;
 
 	i = start;
+	num_of_init_pos = 0;
 	if (!map)
 		return (-1);
 	while (map[i])
@@ -248,12 +250,18 @@ int		map_pre_parsing(char **map, int start)
 		j = 0;
 		while (map[i][j])
 		{		
-			if (c_in_s(map[i][j], "\t 012NSEW\n") == 0)
+			if (c_in_s(map[i][j], " 012NSEW") == 0)
 				return (-2);
+			if (c_in_s(map[i][j], "NSEW") == 1)
+				num_of_init_pos++;
 			j++;
 		}
 		i++;
 	}
+	if (num_of_init_pos > 1)
+		return (-2);
+	if (num_of_init_pos == 0)
+		return (-7);
 	return (1);
 }
 
@@ -432,7 +440,6 @@ int check_if_map(char *line, int num_line)
 			return (-7);
 		i++;
 	}
-	printf("check if map\n");
 	return (num_line);
 }
 
@@ -603,10 +610,10 @@ int	parsing_map(char **map, t_data *data, int start)
 	
 	r = 0;
 	r = map_pre_parsing(map, start);
-	if (r == -2)
+	if (r < 0)
 		return (r);
 	r = check_map_golden_rule(map, start);
-	if (r == -7)
+	if (r < 0)
 		return (r);
 	data->world_wd = map_max_width(map, start);
 	data->world_ht = map_max_height(map, start);

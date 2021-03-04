@@ -34,7 +34,6 @@ void	free_all(t_data *data)
 	free(data->img);
 	free(data->inputs);
 	destroy_sprites(data);
-	free(data);
 }
 
 int		init_window(t_data *data)
