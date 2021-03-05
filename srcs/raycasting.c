@@ -41,8 +41,8 @@ int		init_window(t_data *data)
 	data->mlx = mlx_init();
 	if (data->mlx == NULL)
 		return (-1);
-	data->screen_ht = ft_lite_atoi(data->config->res_y);
-	data->screen_wd = ft_lite_atoi(data->config->res_x);
+	data->screen_ht = data->config->res_y;
+	data->screen_wd = data->config->res_x;
 	data->win =
 		mlx_new_window(data->mlx, data->screen_wd, data->screen_ht, "cub3D");
 	if (data->win == NULL)

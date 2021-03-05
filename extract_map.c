@@ -27,8 +27,8 @@ void	error_handler(int error)
 void init_config(t_data *data)
 {
 	data->config = malloc(sizeof(t_config));
-	data->config->res_x = "";
-	data->config->res_y = "";
+	data->config->res_x = 0;
+	data->config->res_y = 0;
 	data->config->tx_no = "";
 	data->config->tx_so = "";
 	data->config->tx_ea = "";
@@ -49,10 +49,6 @@ void init_config(t_data *data)
 
 void	destroy_config(t_config *config)
 {
-	if (config->res_x[0] != '\0')
-		free(config->res_x);
-	if (config->res_y[0] != '\0')
-		free(config->res_y);
 	if (config->tx_no[0] != '\0')
 		free(config->tx_no);
 	if (config->tx_so[0] != '\0')
@@ -127,7 +123,7 @@ void str_to_array(char **src, int **dest, t_data *data, int start)
 	while (i < max_height)
 	{
 		j = 0;
-		while (src[i + start][j] && j < max_width)
+		while (j < max_width)
 		{
 			if (src[i + start][j] && c_in_s(src[i + start][j], "012") == 1)
 				dest[i][j] = src[i + start][j] - '0';
@@ -338,16 +334,23 @@ int	check_res(char *p, int start)
 
 int	copy_res(char *p, t_config *config, int start)
 {
-	int j;
+	int		j;
+	char	*tmp;
 
 	j = start;
+	tmp = ft_strdup("");
 	while (ft_isdigit(p[j]) == 1)
 	{
-		config->res_x = ft_str_append(config->res_x, p[j]);
+		tmp = ft_str_append(tmp, p[j]);
 		j++;
 	}
+	config->res_x = ft_lite_atoi(tmp); 
+	free(tmp);
+	tmp = ft_strdup("");
 	while (ft_isdigit(p[++j]) == 1)
-		config->res_y = ft_str_append(config->res_y, p[j]);
+		tmp = ft_str_append(tmp, p[j]);
+	config->res_y = ft_lite_atoi(tmp); 
+	free(tmp);
 	config->count_param++;
 	return (0);
 }
@@ -429,20 +432,6 @@ void	parse_param_line(char *p, t_config *config)
 	}
 }
 
-int check_if_map(char *line, int num_line)
-{
-	int i;
-
-	i = 0;
-	while (line[i])
-	{
-		if (line[i] != '1' && line[i] != ' ')
-			return (-7);
-		i++;
-	}
-	return (num_line);
-}
-
 int	check_parameters(t_config *config, int ret)
 {
 	if (!*config->tx_ea)
@@ -455,9 +444,9 @@ int	check_parameters(t_config *config, int ret)
 		ret = -6;
 	else if (!*config->tx_sprite)
 		ret = -6;
-	else if (!*config->res_x)
+	else if (config->res_x < 1)
 		ret = -6;
-	else if (!*config->res_y)
+	else if (config->res_y < 1)
 		ret = -6;
 	else if (config->c_saved < 1)
 		ret = -6;
@@ -465,6 +454,25 @@ int	check_parameters(t_config *config, int ret)
 		ret = -6;
 	return (ret);
 }
+
+int check_if_map(char *line, int num_line, t_config *config)
+{
+	int i;
+
+	i = check_parameters(config, 0);
+	if (i < 0)
+		return (i);
+	else
+		i = 0;
+	while (line[i])
+	{
+		if (line[i] != '1' && line[i] != ' ')
+			return (-7);
+		i++;
+	}
+	return (num_line);
+}
+
 // 8 Elements to parse before map
 int	parsing_parameters(char **line, t_config *config)
 {
@@ -482,7 +490,7 @@ int	parsing_parameters(char **line, t_config *config)
 		else if (valid_elements_pair(line[i][0], line[i][1]) == 1)
 			parse_param_line(line[i++], config);
 		else if (line[i][0] != '\0' && config->count_param == 8)
-			return (check_if_map(line[i], i));
+			return (check_if_map(line[i], i, config));
 		else
 			return (check_parameters(config, -3));
 	}

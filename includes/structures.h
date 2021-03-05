@@ -2,8 +2,8 @@
 #define STRUCTURES_H
 
 typedef struct s_config {
-	char			*res_x;
-	char			*res_y;
+	int				res_x;
+	int				res_y;
 	char			*tx_no;
 	char			*tx_so;
 	char			*tx_ea;
