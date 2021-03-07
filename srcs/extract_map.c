@@ -95,7 +95,7 @@ void	init_player(char dir, int x, int y, t_config *config)
 	config->init_pos_y = y;
 
 	if (dir == 'N')
-		;	
+		;
 	else if (dir == 'S')
 	{
 		init_player_dir(config, M_PI);
@@ -128,7 +128,7 @@ void str_to_array(char **src, int **dest, t_data *data, int start)
 			if (src[i + start][j] && c_in_s(src[i + start][j], "012") == 1)
 				dest[i][j] = src[i + start][j] - '0';
 			else if (src[i + start][j] && c_in_s(src[i + start][j], "NSWE") == 1)
-			{	
+			{
 				init_player(src[i + start][j], i, j, data->config);
 				dest[i][j] = 0;
 			}
@@ -245,7 +245,7 @@ int		map_pre_parsing(char **map, int start)
 	{
 		j = 0;
 		while (map[i][j])
-		{		
+		{
 			if (c_in_s(map[i][j], " 012NSEW") == 0)
 				return (-2);
 			if (c_in_s(map[i][j], "NSEW") == 1)
@@ -344,12 +344,12 @@ int	copy_res(char *p, t_config *config, int start)
 		tmp = ft_str_append(tmp, p[j]);
 		j++;
 	}
-	config->res_x = ft_lite_atoi(tmp); 
+	config->res_x = ft_lite_atoi(tmp);
 	free(tmp);
 	tmp = ft_strdup("");
 	while (ft_isdigit(p[++j]) == 1)
 		tmp = ft_str_append(tmp, p[j]);
-	config->res_y = ft_lite_atoi(tmp); 
+	config->res_y = ft_lite_atoi(tmp);
 	free(tmp);
 	config->count_param++;
 	return (0);
@@ -473,7 +473,6 @@ int check_if_map(char *line, int num_line, t_config *config)
 	return (num_line);
 }
 
-// 8 Elements to parse before map
 int	parsing_parameters(char **line, t_config *config)
 {
 	int i;
@@ -500,21 +499,21 @@ int	parsing_parameters(char **line, t_config *config)
 int	apply_golden_rule(char **map, int i, int j)
 {
 	if (c_in_s(map[i - 1][j - 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i - 1][j], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i - 1][j + 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i][j - 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i][j + 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i + 1][j - 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i + 1][j], " 1") == 0)
-		return (-7); 
+		return (-7);
 	if (c_in_s(map[i + 1][j + 1], " 1") == 0)
-		return (-7); 
+		return (-7);
 	//printf("check golden rule\n");
 	//printf("i - %d <> j - %d\n", i - 9, j);
 	return (1);
@@ -560,7 +559,7 @@ int	check_borders(char **map, int i, int j, int start)
 			return (-7);
 		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
 			return (-7);
-	}		
+	}
 	else if (!map[i + 1][j] && map[i][j] == ' ')
 	{
 		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
@@ -569,7 +568,7 @@ int	check_borders(char **map, int i, int j, int start)
 			return (-7);
 		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
 			return (-7);
-	}		
+	}
 	return (1);
 }
 
@@ -585,7 +584,7 @@ int	is_border(char **map, int i, int j, int start)
 		return (-1);
 	if (!map[i - 1][j] || !map[i + 1][j])
 		return (-1);
-	return (1);	
+	return (1);
 }
 
 int check_map_golden_rule(char **map, int start)
@@ -609,13 +608,13 @@ int check_map_golden_rule(char **map, int start)
 		}
 		i++;
 	}
-	return (r);	
+	return (r);
 }
 
 int	parsing_map(char **map, t_data *data, int start)
 {
 	int	r;
-	
+
 	r = 0;
 	r = map_pre_parsing(map, start);
 	if (r < 0)
@@ -662,13 +661,12 @@ int main(int argc, char *argv[])
 		data = malloc(sizeof(t_data));
 		init_config(data);
 		r = extract_config_elements(data, argv[1]);
+		data->save = ft_strncmp(argv[1], "--save", 7);
+		if (data->save)
+			data->save = 1;
 		if (r >= 0)
 			set_configuration(data);
 		destroy_config(data->config);
-	}
-	else if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) == 0)
-	{
-		printf("yey I saved an Image\n");
 	}
 	else
 		error_handler(-8);

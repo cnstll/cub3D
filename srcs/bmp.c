@@ -43,7 +43,7 @@ int save_img(Image* I, const char *fichier)
 	int tailledata;
 	int pitch;
 	char corrpitch[4] = {0,3,2,1};
-	int fd; 
+	int fd;
 	fd = open(fichier, O_CREAT|O_RDWR, S_IRWXU|S_IRWXG);
 	if (fd < 0)
 		return -1;

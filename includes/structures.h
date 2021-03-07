@@ -46,6 +46,25 @@ typedef struct s_ray {
 	double		ray_dir_y;
 	double		rs;
 	double		ms;
+	int			map_x;
+	int			map_y;
+	double		delta_dx;
+	double		delta_dy;
+	double		side_dx;
+	double		side_dy;
+	double		step_x;
+	double		step_y;
+	double		wall_dist;
+	double		wall_hit;
+	int			side;
+	int			hit;
+	int			step;
+	int			line_h;
+	int			start;
+	int			end;
+	int			tx_x;
+	int			tx_y;
+	double		tx_pos;
 }				t_ray;
 
 typedef struct	s_input {
@@ -96,6 +115,7 @@ typedef struct  s_data {
 	int			world_wd;
 	int			world_ht;
 	int			**buffer;
+	int			save;
 	t_ray		*ray;
 	t_img		*img;
 	t_img		**textures;
