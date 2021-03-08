@@ -1,4 +1,4 @@
-#include "./includes/cube.h"
+#include "../includes/cube.h"
 
 void	error_handler(int error)
 {
@@ -655,18 +655,21 @@ int main(int argc, char *argv[])
 	t_data	*data;
 	int		r;
 
-	if (argc > 1 && argc < 3 && ft_strncmp(argv[1], "--save", 7) != 0)
+	if (argc > 1 && argc < 3)
 	{
 		r = 0;
 		data = malloc(sizeof(t_data));
 		init_config(data);
 		r = extract_config_elements(data, argv[1]);
 		data->save = ft_strncmp(argv[1], "--save", 7);
-		if (data->save)
+		if (data->save == 1)
 			data->save = 1;
-		if (r >= 0)
-			set_configuration(data);
+		if (r >= 0 && data->save != 1)
+			play(data);
+		if (r >= 0 && data->save == 1)
+			save(data);
 		destroy_config(data->config);
+		free_data(data);
 	}
 	else
 		error_handler(-8);

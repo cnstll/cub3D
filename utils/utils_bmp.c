@@ -1,40 +1,43 @@
 #include "./bmp.h"
 
-Image* NouvelleImage(int w,int h)
+bimg* new_bmp_img(int w, int h)
 {
-	Image* I = malloc(sizeof(Image));
-	I->w = w;
-	I->h = h;
-	I->dat = calloc(1,w*h*sizeof(Pixel*));
-	return I;
+	bimg* bimg;
+
+	bimg = malloc(sizeof(bimg));
+	bimg->w = w;
+	bimg->h = h;
+	bimg->dat = calloc(1, w * h * sizeof(t_pixel*));
+	return (bimg);;
 }
 
-Image* CopieImage(Image* I)
+bimg* cpy_bmp_img(bimg* bimg)
 {
-	Image* res;
-	if (!I)
+	bimg* cp;
+	
+	if (!bimg)
 		return NULL;
-	res = NouvelleImage(I->w,I->h);
-	memcpy(res->dat,I->dat,I->w*I->h*sizeof(Pixel));
-	return res;
+	cp = new_bmp_img(bimg->w, bimg->h);
+	memcpy(cp->dat, bimg->dat, bimg->w * bimg->h * sizeof(t_pixel));
+	return (cp);
 }
 
-void DelImage(Image* I)
+void del_bmp_img(bimg* bimg)
 {
-	if (I)
+	if (bimg)
 	{
-		free(I->dat);
-		free(I);
+		free(bimg->dat);
+		free(bimg);
 	}
 }
 
-int	SetPixel(Image* I,int i,int j,Pixel p)
+int	set_pixel(bimg* bimg, int i, int j, t_pixel p)
 {
-	I->dat[I->w * j + i] = p;
+	bimg->dat[bimg->w * j + i] = p;
 	return (1);
 }
 
-Pixel GetPixel(Image* I,int i,int j)
+t_pixel get_pixel(bimg* bimg, int i, int j)
 {
-	return I->dat[I->w * j + i];
+	return bimg->dat[bimg->w * j + i];
 }

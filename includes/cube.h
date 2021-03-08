@@ -14,6 +14,7 @@
 # include "../mlx_linux/mlx.h"
 # include <X11/keysym.h>
 # include <X11/X.h>
+# define  READ_SIZE 64
 
 void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite);
 void	bubble_sort_with_order(double *array, int *order, int size);
@@ -33,12 +34,12 @@ char	*ft_str_append(char *s, char c);
 int		ft_lite_atoi(const char *s);
 char	**ft_lite_split(char *s, char c);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		set_configuration(t_data *data);
-void	calculate_textures(t_ray *ray, t_img **textures, int stripes);
-void	calculate_wall_dist(t_ray *ray);
-void	diff_analysis(t_ray *ray);
+int		play(_data *data);
+void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s);
+void	calculate_wall_dist(t_ray *ray, t_data *data);
+void	diff_analysis(t_ray *ray, int **world);
 void	ray_step_and_side(t_ray *ray);
-void    ray_initiation(t_ray *ray);
+void    ray_initiation(t_ray *ray, int stripes, int max_stripes);
 int		clear_buffer(int **buffer, t_data *data);
 int		draw_buffer(int **buffer, t_data *data);
 int		init_inputs(t_data *data);
@@ -49,4 +50,17 @@ int		init_img(t_data *data);
 int		init_buffer(t_data *data);
 int		init_mlx_window(t_data *data);
 void	free_and_destroy_all(t_data *data);
+void	move_up(t_ray *ray, int **world);
+void	move_down(t_ray *ray, int **world);
+void	move_left(t_ray *ray, int **world);
+void	move_right(t_ray *ray, int **world);
+void	look_left(t_ray *ray);
+void	look_right(t_ray *ray);
+int		clic_to_close(int clic, t_data *data);
+int		handle_player_move(t_data *data);
+int		any_key_pressed(t_input *inputs);
+int		key_press(int keysym, t_data *data);
+int		key_release(int keysym, t_data *data);
+int		render_next_frame(t_data *data);
+int		cast_img(t_data *data, t_ray *ray);
 #endif

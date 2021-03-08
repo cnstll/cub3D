@@ -20,7 +20,7 @@ static int	put_floor(t_data *data, int stripes, int wall_bot)
 	return (1);
 }
 
-static int	cast_img(t_data *data, t_ray *ray)
+int			cast_img(t_data *data, t_ray *ray)
 {
 	int stripes;
 	int max_stripes;
@@ -29,12 +29,11 @@ static int	cast_img(t_data *data, t_ray *ray)
 	max_stripes = data->screen_wd;
 	while (stripes < max_stripes)
 	{
-		ray_initiation(ray);
+		ray_initiation(ray, stripes, max_stripes);
 		ray_step_and_side(ray);
-		diff_analysis(ray);
-		calculate_wall_dist(ray);
-		ray->tx_x = (int)(ray->wall_hit * (double)(ray->tx_wd));
-		calculate_textures(ray, data->textures, stripes);
+		diff_analysis(ray, data->world);
+		calculate_wall_dist(ray, data);
+		calculate_textures(data, ray, data->textures, stripes);
 		put_ceilling(data, stripes, ray->start);
 		put_floor(data, stripes, ray->end);
 		data->sprite->buffer[stripes] = ray->wall_dist;
@@ -53,11 +52,5 @@ int			render_next_frame(t_data *data)
 	draw_buffer(data->buffer, data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img->img, 0, 0);
 	clear_buffer(data->buffer, data);
-	return (1);
-}
-
-int			build_screenshot(t_data *data)
-{
-	cast_img(data, data->ray);
 	return (1);
 }

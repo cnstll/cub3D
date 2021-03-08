@@ -13,49 +13,50 @@ typedef int int32;
 
 typedef short int16;
 
-struct BMPImHead
+typedef struct	s_img_header
 {
-	int32 size_imhead;
-	int32 width;
-	int32 height;
-	int16 nbplans; // toujours 1
+	int32 size_img_header;
+	int32 wd;
+	int32 ht;
+	int16 planes;
 	int16 bpp;
 	int32 compression;
-	int32 sizeim;
+	int32 size_img;
 	int32 hres;
 	int32 vres;
-	int32 cpalette;
-	int32 cIpalette;
-};
+	int32 c_table;
+	int32 c_img_table;
+}				t_img_header;
 
-struct BMPHead
+typedef struct	s_head
 {
-	char signature[2];
-	int32 taille;
-	int32 rsv;
-	int32 offsetim;
-	struct BMPImHead imhead;
-};
+	char			signature[2];
+	int32			size;
+	int32			reserved;
+	int32			img_offset;
+	t_img_header	img_head;
+}				t_head;
 #pragma pack(pop)
 
-typedef struct Pixel
+typedef struct	s_pixel
 {
-	unsigned char r,g,b;
-} Pixel;
+	unsigned char	r;
+	unsigned char	g;
+	unsigned char	b;
+}				t_pixel;
 
-typedef struct Image
+typedef struct	s_bimg 
 {
-	int w,h;
-	Pixel* dat;
-} Image;
+	int		w;
+	int		h;
+	t_pixel	*dat;
+}				t_bimg;
 
-Image* Charger(const char* fichier);
-int Sauver(Image*,const char* fichier);
-Image* NouvelleImage(int w,int h);
-Image* CopieImage(Image*);
-int SetPixel(Image*,int i,int j,Pixel p);
-Pixel GetPixel(Image*,int i,int j);
-void DelImage(Image*);
-
+int		Sauver(Image*,const char* fichier);
+img		*new_bmp_img(int w, int h);
+bimg	*cpy_bmp_img(bimg* bimg);
+void	del_bmp_img(bimg* bimg);
+int		set_pixel(bimg* bimg, int i, int j, t_pixel p);
+t_pixel	get_pixel(bimg* bimg, int i, int j);
 #endif
  

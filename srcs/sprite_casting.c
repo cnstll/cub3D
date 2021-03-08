@@ -37,11 +37,13 @@ static void	put_sprite_stripes(t_data *data, t_sprite *sprite, int stripe)
 	while(y < sprite->end_y)
 	{
 		d = y * 256 - data->screen_ht * 128 + sprite->height * 128;
-		sprite->tx_y = ((d * TEXTR_HT) / sprite->height) / 256;
+		sprite->tx_y =
+			((d * data->textures[4]->height) / sprite->height) / 256;
 		if (sprite->tx_y < 0)
 			sprite->tx_y = fabs(sprite->tx_y);
 		color =
-			data->textures[4]->addr[TEXTR_WD * sprite->tx_y + sprite->tx_x];
+			data->textures[4]->addr[data->textures[4]->width
+			* sprite->tx_y + sprite->tx_x];
 		if((color & 0x00FFFFFF) != 0)
 			data->buffer[y][stripe] = color;
 		y++;
@@ -57,7 +59,7 @@ static void	put_sprite(t_data *data, t_sprite *sprite)
 	{
 		sprite->tx_x =
 				(int)(256 * (i - (-sprite->width / 2 + sprite->screen_x))
-				* TEXTR_WD / sprite->width) / 256;
+				* data->textures[4]->width / sprite->width) / 256;
 		if(sprite->transfo_y > 0 && i > 0 && i < data->screen_wd
 				&& sprite->transfo_y < sprite->buffer[i])
 		{

@@ -1,6 +1,6 @@
 #include "../includes/cube.h"
 
-void    ray_initiation(t_ray *ray)
+void    ray_initiation(t_ray *ray, int stripes, int max_stripes)
 {
 	ray->camera_x = 2 * stripes / (double)(max_stripes) - 1;
 	ray->ray_dir_x = ray->dir_x + ray->plane_x * ray->camera_x;
@@ -46,7 +46,7 @@ void	ray_step_and_side(t_ray *ray)
 	}
 }
 
-void	diff_analysis(t_ray *ray)
+void	diff_analysis(t_ray *ray, int **world)
 {
 	while (ray->hit == 0)
 	{
@@ -62,13 +62,13 @@ void	diff_analysis(t_ray *ray)
 			ray->map_y += ray->step_y;
 			ray->side = 1;
 		}
-		if (data->world[ray->map_x][ray->map_y]
-			&& data->world[ray->map_x][ray->map_y] == 1)
+		if (world[ray->map_x][ray->map_y]
+			&& world[ray->map_x][ray->map_y] == 1)
 			ray->hit = 1;
 	}
 }
 
-void	calclulate_wall_dist(t_ray *ray)
+void	calculate_wall_dist(t_ray *ray, t_data *data)
 {
 	if (ray->side == 0)
 		ray->wall_dist = (ray->map_x - ray->pos_x + (1 - ray->step_x) / 2)
@@ -90,31 +90,32 @@ void	calclulate_wall_dist(t_ray *ray)
 	ray->wall_hit -= floor((ray->wall_hit));
 }
 
-void	calculate_textures(t_ray *ray, t_img **textures, *int stripes)
+void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s)
 {
 	int	lines;
 	int	c;
+	int tx_n;
 
-	if(ray->side == 0 && ray->ray_dir_x > 0)
-		ray->tx_x = ray->tx_wd - ray->tx_x - 1;
-	if(ray->side == 1 && ray->ray_dir_y < 0)
-		ray->tx_x = ray->tx_wd - ray->tx_x - 1;
-	ray->step = 1.0 * ray->tx_ht / ray->line_height;
+	if(ray->side == 0 && ray->ray_dir_x < 0)
+		tx_n = 0;
+	else if (ray->side == 0 && ray->ray_dir_x > 0)
+		tx_n = 1;
+	else if(ray->side == 1 && ray->ray_dir_y < 0)
+		tx_n = 2;
+	else
+		tx_n = 3;
+	ray->tx_x = (int)(ray->wall_hit * (double)(textures[tx_n]->width));
+	ray->tx_x = textures[tx_n]->width - ray->tx_x - 1;
+	ray->step = 1.0 * textures[tx_n]->height / ray->line_h;
 	ray->tx_pos = (ray->start - data->screen_ht / 2 + (ray->line_h / 2))
 		* ray->step;
 	lines = ray->start;
 	while (lines < ray->end)
 	{
-		ray->tx_y = (int)(ray->tx_pos) & (textures[0]->height - 1);
+		ray->tx_y = (int)(ray->tx_pos) & (textures[tx_n]->height - 1);
 		ray->tx_pos += ray->step;
-		if (ray->side == 0 && ray->ray_dir_x < 0)
-			c = textures[0]->addr[textures[0]->width * ray->tx_y + ray->tx_x];
-		else if (ray->side == 0 && ray->ray_dir_x >= 0)
-			c = textures[1]->addr[textures[1]->width * ray->tx_y + ray->tx_x];
-		else if (ray->side == 1 && ray->ray_dir_y < 0)
-			c = textures[2]->addr[textures[2]->width * ray->tx_y + ray->tx_x];
-		else
-			c = textures[3]->addr[textures[3]->width * ray->tx_y + ray->tx_x];
-		data->buffer[lines++][stripes] = c;
+		c = textures[tx_n]->addr[textures[tx_n]->width * ray->tx_y + ray->tx_x];
+		data->buffer[lines][s] = c;
+		lines++;
 	}
 }

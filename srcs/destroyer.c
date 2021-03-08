@@ -22,7 +22,7 @@ void	destroy_textures(t_data *data)
 	free(data->textures);
 }
 
-void	free_and_destroy_all(t_data *data)
+void	free_and_destroy_play(t_data *data)
 {
 	free(data->mlx);
 	free(data->ray);
@@ -31,3 +31,12 @@ void	free_and_destroy_all(t_data *data)
 	destroy_sprites(data);
 	destroy_textures(data);
 }
+
+void	free_and_destroy_save(t_data *data)
+{
+	free(data->ray);
+	free(data->inputs);
+	destroy_sprites(data);
+	destroy_textures(data);
+}
+

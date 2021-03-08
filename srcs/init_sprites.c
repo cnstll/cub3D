@@ -1,4 +1,4 @@
-#include "../includes/cube.h/"
+#include "../includes/cube.h"
 
 int	find_sprite_num(t_data *data)
 {

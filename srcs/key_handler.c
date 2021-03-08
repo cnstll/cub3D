@@ -34,7 +34,6 @@ int		key_press(int keysym, t_data *data)
 	if (keysym == XK_Escape && data->win)
 	{
 		data->inputs->key_esc = 1;
-		destroy_textures(data);
 		free_2d_array(data->buffer, data->screen_ht);
 		mlx_destroy_window(data->mlx, data->win);
 		mlx_loop_end(data->mlx);
@@ -92,7 +91,6 @@ int		clic_to_close(int clic, t_data *data)
 	{
 		printf("closing\n");
 		data->inputs->key_esc = 1;
-		destroy_textures(data);
 		free_2d_array(data->buffer, data->screen_ht);
 		mlx_destroy_window(data->mlx, data->win);
 		mlx_loop_end(data->mlx);

@@ -1,6 +1,8 @@
 NAME = cub3D
 
 SRCS = srcs/raycasting.c \
+		srcs/raycasting_utils.c \
+		srcs/game.c \
 		srcs/sprite_casting.c\
 		srcs/sprite_sorter.c \
 		srcs/extract_map.c \

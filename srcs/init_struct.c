@@ -40,7 +40,7 @@ int		init_ray(t_data *data)
 	data->ray = malloc(sizeof(t_ray));
 	data->ray->pos_x = data->config->init_pos_x;
 	data->ray->pos_y = data->config->init_pos_y;
-	data->ray->ms = 0.01;
+	data->ray->ms = 0.03;
 	data->ray->rs = 0.01;
 	data->ray->dir_x = data->config->init_dir_x;
 	data->ray->dir_y = data->config->init_dir_y;

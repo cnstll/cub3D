@@ -58,7 +58,7 @@ typedef struct s_ray {
 	double		wall_hit;
 	int			side;
 	int			hit;
-	int			step;
+	double		step;
 	int			line_h;
 	int			start;
 	int			end;
