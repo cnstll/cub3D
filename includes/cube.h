@@ -66,4 +66,26 @@ int		key_press(int keysym, t_data *data);
 int		key_release(int keysym, t_data *data);
 int		render_next_frame(t_data *data);
 int		cast_img(t_data *data, t_ray *ray);
+int		map_max_height(char **map, int start);
+int		map_max_width(char **map, int start);
+char	*file_to_str(char *path_file);
+int		check_res(char *p, int start);
+int		copy_res(char *p, t_config *config, int start);
+int		check_color(char *p, int start);
+int		copy_color(char *p, t_config *config, int start);
+void	parse_param_line(char *p, t_config *config);
+unsigned long	rgb_to_hex(int r, int g, int b);
+int		valid_elements_pair(char e1, char e2);
+int		check_path(char *p, int start);
+int		copy_path(char *p, t_config *config, int start);
+int		check_parameters(t_config *config, int ret);
+int		check_if_map(char *line, int num_line, t_config *config);
+void	init_player(char dir, int x, int y, t_config *config);
+void	init_player_dir(t_config *config, double rot);
+void	init_config(t_data *data);
+void	destroy_config(t_config *config);
+void	error_handler(int error);
+int		extract_config_elements(t_data *data, char *path_file);
+
+
 #endif
