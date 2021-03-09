@@ -1,3 +1,15 @@
+/****************************************************************************/
+/*                                                                          */
+/*                                                       :::      ::::::::  */
+/*  bmp.c                                              :+:      :+:    :+:  */
+/*                                                   +:+ +:+         +:+    */
+/*  By: calle <calle@student.42.fr>                +#+  +:+       +#+       */
+/*                                               +#+#+#+#+#+   +#+          */
+/*  Created: 2021/03/09 20:08:13 by calle             #+#    #+#            */
+/*  Updated: 2021/03/09 20:08:13 by calle            ###   ########.fr      */
+/*                                                                          */
+/****************************************************************************/
+
 #include "../includes/cube.h"
 
 static void	init_head(t_head *head, t_bimg *bimg)
@@ -31,9 +43,6 @@ static void	write_pixels(int pitch, t_bimg *bimg, int fd)
 	t_pixel			p;
 
 	i = 0;
-	bgr_pix[0] = 0;
-	bgr_pix[1] = 0;
-	bgr_pix[2] = 0;
 	while (i < bimg->h)
 	{
 		j = 0;
@@ -54,7 +63,7 @@ static void	write_pixels(int pitch, t_bimg *bimg, int fd)
 	}
 }
 
-static int		save_img(t_bimg* bimg, const char *file)
+static int	save_img(t_bimg* bimg, const char *file)
 {
 	t_head	head;
 	int		pitch;
@@ -65,10 +74,10 @@ static int		save_img(t_bimg* bimg, const char *file)
 	fd = open(file, O_CREAT|O_RDWR, S_IRWXU|S_IRWXG);
 	if (fd < 0)
 		return -1;
-	memset(&head, 0, sizeof(t_head));
+	ft_memset(&head, 0, sizeof(t_head));
 	init_head(&head, bimg);
 	pitch = corrpitch[(3 * head.img_head.wd) % 4];
-	data_size = 3 * head.img_head.ht * head.img_head.wd 
+	data_size = 3 * head.img_head.ht * head.img_head.wd
 				+ head.img_head.ht * pitch;
 	head.img_head.size_img = data_size;
 	head.size = head.img_offset + head.img_head.size_img;
@@ -78,7 +87,7 @@ static int		save_img(t_bimg* bimg, const char *file)
 	return 0;
 }
 
-int		copy_buffer_to_bimg(t_data *data, int **buf) 
+int			copy_buffer_to_bimg(t_data *data, int **buf)
 {
 	int	i;
 	int	j;

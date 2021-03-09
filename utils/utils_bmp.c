@@ -7,18 +7,18 @@ t_bimg *new_bmp_img(int w, int h)
 	bimg = malloc(sizeof(t_bimg));
 	bimg->w = w;
 	bimg->h = h;
-	bimg->dat = calloc(1, w * h * sizeof(t_pixel *));
+	bimg->dat = ft_calloc(1, w * h * sizeof(t_pixel *));
 	return (bimg);
 }
 
 t_bimg *cpy_bmp_img(t_bimg *bimg)
 {
 	t_bimg *cp;
-	
+
 	if (!bimg)
 		return NULL;
 	cp = new_bmp_img(bimg->w, bimg->h);
-	memcpy(cp->dat, bimg->dat, bimg->w * bimg->h * sizeof(t_pixel));
+	ft_memcpy(cp->dat, bimg->dat, bimg->w * bimg->h * sizeof(t_pixel));
 	return (cp);
 }
 

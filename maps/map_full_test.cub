@@ -1,10 +1,17 @@
-R 640 480
+
+
+R 1980 1080
 NO ./textures/colorstone.xpm
+
+
+
 EA ./textures/redbrick.xpm
 WE ./textures/mossy.xpm
+
 S ./textures/barrel.xpm
 F 220,100,0
 C 225,30,0
+
 SO ./textures/wood.xpm
 
     11111111   11111111111

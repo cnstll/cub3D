@@ -1,4 +1,5 @@
 #include "../includes/cube.h"
+
 void	error_handler(int error)
 {
 	if (error < 0)

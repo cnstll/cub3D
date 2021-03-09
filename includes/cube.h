@@ -3,6 +3,7 @@
 
 # include "./structures.h"
 # include "./bmp.h"
+# include "../libft/libft.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -86,6 +87,8 @@ void	init_config(t_data *data);
 void	destroy_config(t_config *config);
 void	error_handler(int error);
 int		extract_config_elements(t_data *data, char *path_file);
-
+int		check_map_golden_rule(char **map, int start);
+int		parsing_parameters(char **line, t_config *config);
+int		parsing_map(char **map, t_data *data, int start);
 
 #endif
