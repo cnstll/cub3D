@@ -1,88 +1,105 @@
-#include "./bmp.h"
-int	init_head(t_head head)
-{
-	int	data_size;
+#include "../includes/cube.h"
 
-	data_size = 0;
-	head.signature[0] = 'B';
-	head.signature[1] = 'M';
-	head.img_offset = sizeof(t_head);
-	head.img_head.size_img_head = sizeof(t_head);
-	head.img_head.wd = I->w;
-	head.img_head.ht = I->h;
-	head.img_head.planes = 1;
-	head.img_head.bpp = 24;
-	data_size = 3 * head.img_head.ht * head.img_head.wd 
-				+ head.img_head.ht * pitch;
-	head.img_head.size_img = data_size;
-	head.size = head.img_offset + head.img_head.size_img;
+static void	init_head(t_head *head, t_bimg *bimg)
+{
+	head->signature[0] = 'B';
+	head->signature[1] = 'M';
+	head->img_offset = sizeof(t_head);
+	head->img_head.size_img_header = sizeof(t_img_header);
+	head->img_head.wd = bimg->w;
+	head->img_head.ht = bimg->h;
+	head->img_head.planes = 1;
+	head->img_head.bpp = 24;
 }
 
-void	write_pixels(int pitch)
+static int	hexa_to_rgb(int color, char rgb)
 {
-	int	i;
-	int	j;
-	unsigned char bgrpix[3];
+	if (rgb == 'R')
+		return ((color & 0xff0000) >> 16);
+	if (rgb == 'G')
+		return ((color & 0x00ff00) >> 8);
+	if (rgb == 'B')
+		return (color & 0x0000ff);
+	return (-1);
+}
+
+static void	write_pixels(int pitch, t_bimg *bimg, int fd)
+{
+	int				i;
+	int				j;
+	unsigned char	bgr_pix[3];
+	t_pixel			p;
 
 	i = 0;
-	while (i < I->h)
+	bgr_pix[0] = 0;
+	bgr_pix[1] = 0;
+	bgr_pix[2] = 0;
+	while (i < bimg->h)
 	{
 		j = 0;
-		while (j < I->w)
+		while (j < bimg->w)
 		{
-			p = GetPixel(I,i,I->h-j-1);
-			bgrpix[0] = p.b;
-			bgrpix[1] = p.g;
-			bgrpix[2] = p.r;
-			write(fd, &bgrpix ,3);
+			p = get_pixel(bimg, bimg->h - i, j);
+			bgr_pix[0] = p.b;
+			bgr_pix[1] = p.g;
+			bgr_pix[2] = p.r;
+			write(fd, &bgr_pix ,3);
 			j++;
 		}
-		bgrpix[0] = bgrpix[1] = bgrpix[2] = 0;
-		write(fd, &bgrpix, pitch);
+		bgr_pix[0] = 0;
+		bgr_pix[1] = 0;
+		bgr_pix[2] = 0;
+		write(fd, &bgr_pix, pitch);
 		i++;
 	}
 }
 
-int save_img(b_img* bimg, const char *file)
+static int		save_img(t_bimg* bimg, const char *file)
 {
-	t_head head;
-	Pixel p;
-	int pitch;
-	char corrpitch[4] = {0,3,2,1};
-	int fd;
+	t_head	head;
+	int		pitch;
+	int		data_size;
+	char	corrpitch[4] = {0,3,2,1};
+	int		fd;
+
 	fd = open(file, O_CREAT|O_RDWR, S_IRWXU|S_IRWXG);
 	if (fd < 0)
 		return -1;
-	memset(&head, 0, sizeof(struct BMPHead));
-	init_head(head);
+	memset(&head, 0, sizeof(t_head));
+	init_head(&head, bimg);
 	pitch = corrpitch[(3 * head.img_head.wd) % 4];
-	write(fd, &head, sizeof(struct t_head));
+	data_size = 3 * head.img_head.ht * head.img_head.wd 
+				+ head.img_head.ht * pitch;
+	head.img_head.size_img = data_size;
+	head.size = head.img_offset + head.img_head.size_img;
+	write(fd, &head, sizeof(t_head));
+	write_pixels(pitch, bimg, fd);
 	close(fd);
 	return 0;
 }
 
-int		copy_buffer(t_data *data, int **buf) 
+int		copy_buffer_to_bimg(t_data *data, int **buf) 
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	Image* I = NouvelleImage(data->screen_wd,data->screen_ht);
+	t_bimg* bimg = new_bmp_img(data->screen_wd,data->screen_ht);
 	while (i < data->screen_ht)
 	{
 		j = 0;
 		while (j < data->screen_wd)
 		{
-			Pixel p;
-			p.r = i;
-			p.g = j;
-			p.b = 0;
-			SetPixel(I,i,j,p);
+			t_pixel p;
+			p.r = hexa_to_rgb(buf[i][j], 'R');
+			p.g = hexa_to_rgb(buf[i][j], 'G');
+			p.b = hexa_to_rgb(buf[i][j], 'B');
+			set_pixel(bimg, i, j, p);
 			j++;
 		}
 		i++;
 	}
-	Sauver(I,"test.bmp");
-	DelImage(I);
+	save_img(bimg,"save.bmp");
+	del_bmp_img(bimg);
 	return 0;
 }

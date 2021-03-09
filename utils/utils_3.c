@@ -47,7 +47,7 @@ char			*ft_str_append(char *s, char c)
 	}
 	r[i++] = c;
 	r[i] = '\0';
-	if ((*s))
+	if ((s))
 		free(s);
 	return (r);
 }

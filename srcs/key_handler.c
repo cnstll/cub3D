@@ -34,8 +34,6 @@ int		key_press(int keysym, t_data *data)
 	if (keysym == XK_Escape && data->win)
 	{
 		data->inputs->key_esc = 1;
-		free_2d_array(data->buffer, data->screen_ht);
-		mlx_destroy_window(data->mlx, data->win);
 		mlx_loop_end(data->mlx);
 	}
 	return (1);
@@ -82,18 +80,4 @@ int		handle_player_move(t_data *data)
 	if (any_key_pressed(data->inputs) == 1 && esc < 1)
 		render_next_frame(data);
 	return (1);
-}
-
-int		clic_to_close(int clic, t_data *data)
-{
-	printf("%d\n", clic);
-	if (clic == 1634464352)
-	{
-		printf("closing\n");
-		data->inputs->key_esc = 1;
-		free_2d_array(data->buffer, data->screen_ht);
-		mlx_destroy_window(data->mlx, data->win);
-		mlx_loop_end(data->mlx);
-	}
-	return(1);
 }

@@ -6,8 +6,8 @@ int load_textures(t_data *data, t_img **textures)
 
 	textures[0]->file_paths = ft_strdup(data->config->tx_no);
 	textures[1]->file_paths = ft_strdup(data->config->tx_so);
-	textures[2]->file_paths = ft_strdup(data->config->tx_ea);
-	textures[3]->file_paths = ft_strdup(data->config->tx_we);
+	textures[2]->file_paths = ft_strdup(data->config->tx_we);
+	textures[3]->file_paths = ft_strdup(data->config->tx_ea);
 	textures[4]->file_paths = ft_strdup(data->config->tx_sprite);
 	x = 0;
 	while (x < 5)

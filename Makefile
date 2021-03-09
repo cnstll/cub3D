@@ -14,9 +14,11 @@ SRCS = srcs/raycasting.c \
 		srcs/key_handler.c \
 		srcs/player_move.c \
 		srcs/player_move2.c \
+		srcs/bmp.c \
 		utils/utils_1.c \
 		utils/utils_2.c \
-		utils/utils_3.c
+		utils/utils_3.c \
+		utils/utils_bmp.c
 
 OBJS = $(SRCS:.c=.o)
 

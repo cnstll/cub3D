@@ -660,16 +660,17 @@ int main(int argc, char *argv[])
 		r = 0;
 		data = malloc(sizeof(t_data));
 		init_config(data);
-		r = extract_config_elements(data, argv[1]);
 		data->save = ft_strncmp(argv[1], "--save", 7);
-		if (data->save == 1)
-			data->save = 1;
-		if (r >= 0 && data->save != 1)
+		if (data->save == 0)
+			r = extract_config_elements(data, "./maps/map_full_test.cub");
+		else
+			r = extract_config_elements(data, argv[1]);
+		if (r >= 0 && data->save != 0)
 			play(data);
-		if (r >= 0 && data->save == 1)
+		if (r >= 0 && data->save == 0)
 			save(data);
 		destroy_config(data->config);
-		free_data(data);
+		free(data);
 	}
 	else
 		error_handler(-8);

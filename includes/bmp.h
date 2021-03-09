@@ -52,11 +52,11 @@ typedef struct	s_bimg
 	t_pixel	*dat;
 }				t_bimg;
 
-int		Sauver(Image*,const char* fichier);
-img		*new_bmp_img(int w, int h);
-bimg	*cpy_bmp_img(bimg* bimg);
-void	del_bmp_img(bimg* bimg);
-int		set_pixel(bimg* bimg, int i, int j, t_pixel p);
-t_pixel	get_pixel(bimg* bimg, int i, int j);
+int		copy_buffer_to_bimg(t_data *data, int **buf);
+t_bimg	*new_bmp_img(int w, int h);
+t_bimg	*cpy_bmp_img(t_bimg *bimg);
+void	del_bmp_img(t_bimg *bimg);
+int		set_pixel(t_bimg *bimg, int i, int j, t_pixel p);
+t_pixel	get_pixel(t_bimg *bimg, int i, int j);
 #endif
  

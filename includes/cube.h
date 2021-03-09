@@ -2,6 +2,7 @@
 #define CUBE_H
 
 # include "./structures.h"
+# include "./bmp.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -34,7 +35,8 @@ char	*ft_str_append(char *s, char c);
 int		ft_lite_atoi(const char *s);
 char	**ft_lite_split(char *s, char c);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		play(_data *data);
+int		play(t_data *data);
+int		save(t_data *data);
 void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s);
 void	calculate_wall_dist(t_ray *ray, t_data *data);
 void	diff_analysis(t_ray *ray, int **world);
@@ -49,7 +51,8 @@ int		init_ray(t_data *data);
 int		init_img(t_data *data);
 int		init_buffer(t_data *data);
 int		init_mlx_window(t_data *data);
-void	free_and_destroy_all(t_data *data);
+void	free_and_destroy_save(t_data *data);
+void	free_and_destroy_play(t_data *data);
 void	move_up(t_ray *ray, int **world);
 void	move_down(t_ray *ray, int **world);
 void	move_left(t_ray *ray, int **world);

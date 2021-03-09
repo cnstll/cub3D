@@ -1,19 +1,19 @@
-#include "./bmp.h"
+#include "../includes/cube.h"
 
-bimg* new_bmp_img(int w, int h)
+t_bimg *new_bmp_img(int w, int h)
 {
-	bimg* bimg;
+	t_bimg *bimg;
 
-	bimg = malloc(sizeof(bimg));
+	bimg = malloc(sizeof(t_bimg));
 	bimg->w = w;
 	bimg->h = h;
-	bimg->dat = calloc(1, w * h * sizeof(t_pixel*));
-	return (bimg);;
+	bimg->dat = calloc(1, w * h * sizeof(t_pixel *));
+	return (bimg);
 }
 
-bimg* cpy_bmp_img(bimg* bimg)
+t_bimg *cpy_bmp_img(t_bimg *bimg)
 {
-	bimg* cp;
+	t_bimg *cp;
 	
 	if (!bimg)
 		return NULL;
@@ -22,7 +22,7 @@ bimg* cpy_bmp_img(bimg* bimg)
 	return (cp);
 }
 
-void del_bmp_img(bimg* bimg)
+void del_bmp_img(t_bimg* bimg)
 {
 	if (bimg)
 	{
@@ -31,13 +31,21 @@ void del_bmp_img(bimg* bimg)
 	}
 }
 
-int	set_pixel(bimg* bimg, int i, int j, t_pixel p)
+int	set_pixel(t_bimg* bimg, int i, int j, t_pixel p)
 {
+	if (j < 0)
+		j = 0;
+	if (i < 0)
+		i = 0;
 	bimg->dat[bimg->w * j + i] = p;
 	return (1);
 }
 
-t_pixel get_pixel(bimg* bimg, int i, int j)
+t_pixel get_pixel(t_bimg* bimg, int i, int j)
 {
+	if (j < 0)
+		j = 0;
+	if (i < 0)
+		i = 0;
 	return bimg->dat[bimg->w * j + i];
 }
