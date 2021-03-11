@@ -1,12 +1,11 @@
 
 
-R 1024 768
+R 640 480
 NO ./textures/colorstone.xpm
 
 
 EA ./textures/redbrick.xpm
 WE ./textures/mossy.xpm
-EA ./textures/redbrick.xpm
 
 S ./textures/linus_sprite.xpm
 F 220,255,255

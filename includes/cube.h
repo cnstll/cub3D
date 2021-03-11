@@ -62,7 +62,6 @@ void	look_left(t_ray *ray);
 void	look_right(t_ray *ray);
 int		clic_to_close(int clic, t_data *data);
 int		handle_player_move(t_data *data);
-int		any_key_pressed(t_input *inputs);
 int		key_press(int keysym, t_data *data);
 int		key_release(int keysym, t_data *data);
 int		render_next_frame(t_data *data);
@@ -81,14 +80,16 @@ int		check_path(char *p, int start);
 int		copy_path(char *p, t_config *config, int start);
 int		check_parameters(t_config *config, int ret);
 int		check_if_map(char *line, int num_line, t_config *config);
+int		check_texture_file(char *file_path);
 void	init_player(char dir, int x, int y, t_config *config);
 void	init_player_dir(t_config *config, double rot);
 void	init_config(t_data *data);
-void	destroy_config(t_config *config);
+void	destroy_config(t_data *data, t_config *config);
 void	error_handler(int error);
-int		extract_config_elements(t_data *data, char *path_file);
+int		extract_config_elements(t_data *data, char *file_path);
 int		check_map_golden_rule(char **map, int start);
 int		parsing_parameters(char **line, t_config *config);
 int		parsing_map(char **map, t_data *data, int start);
+int		check_filepath(char *file_path);
 
 #endif

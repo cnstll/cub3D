@@ -19,7 +19,9 @@ void	error_handler(int error)
 	else if (error == -7)
 		printf("Invalid map\n");
 	else if (error == -8)
-		printf("No input file\n");
-	else
-		printf("Configuration ok\n");
+		printf("Invalid or missing input file\n");
+	else if (error == -9)
+		printf("Invalid or missing argument\n");
+	else if (error < -9)
+		printf("Unexpected error\n");
 }

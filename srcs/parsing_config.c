@@ -88,6 +88,11 @@ int	copy_color(char *p, t_config *config, int start)
 		config->f_saved++;
 	if (p[0] == 'C')
 		config->c_saved++;
+	if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
+	{
+		config->f_saved--;
+		config->c_saved--;
+	}
 	config->count_param++;
 	return (0);
 }

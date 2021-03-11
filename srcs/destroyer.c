@@ -1,6 +1,6 @@
 #include "../includes/cube.h"
 
-void	destroy_config(t_config *config)
+void	destroy_config(t_data *data, t_config *config)
 {
 	if (config->tx_no[0] != '\0')
 		free(config->tx_no);
@@ -13,6 +13,7 @@ void	destroy_config(t_config *config)
 	if (config->tx_sprite[0] != '\0')
 		free(config->tx_sprite);
 	free(config);
+	free(data);
 }
 
 void	destroy_sprites(t_data *data)

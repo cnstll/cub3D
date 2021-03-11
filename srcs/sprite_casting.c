@@ -44,7 +44,7 @@ static void	put_sprite_stripes(t_data *data, t_sprite *sprite, int stripe)
 		color =
 			data->textures[4]->addr[data->textures[4]->width
 			* sprite->tx_y + sprite->tx_x];
-		if((color & 0x00FFFFFF) != 0)
+		if((color & 0x00FF00FF) != 0)
 			data->buffer[y][stripe] = color;
 		y++;
 	}

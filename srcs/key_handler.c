@@ -39,27 +39,6 @@ int		key_press(int keysym, t_data *data)
 	return (1);
 }
 
-int		any_key_pressed(t_input *inputs)
-{
-	int	ret;
-
-	if (inputs->key_w == 1)
-		ret = 1;
-	else if (inputs->key_s == 1)
-		ret = 1;
-	else if (inputs->key_a == 1)
-		ret = 1;
-	else if (inputs->key_d == 1)
-		ret = 1;
-	else if (inputs->key_left == 1)
-		ret = 1;
-	else if (inputs->key_right == 1)
-		ret = 1;
-	else
-		ret = 0;
-	return (ret);
-}
-
 int		handle_player_move(t_data *data)
 {
 	int	esc;
@@ -77,7 +56,6 @@ int		handle_player_move(t_data *data)
 		look_left(data->ray);
 	if (data->inputs->key_right == 1)
 		look_right(data->ray);
-	if (any_key_pressed(data->inputs) == 1 && esc < 1)
-		render_next_frame(data);
+	render_next_frame(data);
 	return (1);
 }

@@ -2,8 +2,22 @@
 
 int		init_buffer(t_data *data)
 {
+	int size_x;
+	int size_y;
+
+	size_x = 0;
+	size_y = 0;
+	data->mlx = mlx_init();
+	if (data->mlx == NULL)
+		return (-1);
 	data->screen_ht = data->config->res_y;
 	data->screen_wd = data->config->res_x;
+	mlx_get_screen_size(data->mlx, &size_x, &size_y);
+	if (!data->save && (data->screen_wd > size_x || data->screen_ht > size_y))
+	{
+		data->screen_wd = size_x;
+		data->screen_ht = size_y;
+	}
 	data->buffer = NULL;
 	data->buffer =
 		malloc_2d_array(data->buffer, data->screen_wd, data->screen_ht);
@@ -14,9 +28,6 @@ int		init_buffer(t_data *data)
 
 int		init_mlx_window(t_data *data)
 {
-	data->mlx = mlx_init();
-	if (data->mlx == NULL)
-		return (-1);
 	data->win =
 		mlx_new_window(data->mlx, data->screen_wd, data->screen_ht, "cub3D");
 	if (data->win == NULL)
@@ -40,8 +51,8 @@ int		init_ray(t_data *data)
 	data->ray = malloc(sizeof(t_ray));
 	data->ray->pos_x = data->config->init_pos_x;
 	data->ray->pos_y = data->config->init_pos_y;
-	data->ray->ms = 0.04;
-	data->ray->rs = 0.03;
+	data->ray->ms = 0.05;
+	data->ray->rs = 0.04;
 	data->ray->dir_x = data->config->init_dir_x;
 	data->ray->dir_y = data->config->init_dir_y;
 	data->ray->plane_x = data->config->init_plane_x;

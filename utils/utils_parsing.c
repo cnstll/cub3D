@@ -34,6 +34,21 @@ int				map_max_height(char **map, int start)
 	return (max);
 }
 
+int				check_filepath(char *file_path)
+{
+	int		i;
+	char	*r;
+
+	i = 0;
+	while (file_path && file_path[i])
+		i++;
+	r = ft_strnstr(file_path, ".cub", i);
+	if (!r)
+		return (-1);
+	else
+		return (1);
+}
+
 char			*file_to_str(char *path_file)
 {
 	int fd;

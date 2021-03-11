@@ -5,11 +5,16 @@ int	check_path(char *p, int start)
 	int j;
 
 	j = start;
-	//ajouter ft_strnstr(.., ".cub");
 	while (p[j])
 	{
 		if (ft_isalpha(p[j]) == 1 || p[j] == '_' || p[j] == '/' || p[j] == '.')
+		{
+			if (p[j] == '.' && ft_strncmp(p + j, ".xpm", 5) != 0)
+				return (-1);
+			else if (p[j] == '/' && (ft_isalpha(p[j + 1]) == 0 || p[j + 1] == '.'))
+				return (-1);
 			j++;
+		}
 		else
 			return (-1);
 	}
@@ -50,23 +55,19 @@ int valid_elements_pair(char e1, char e2)
 
 int	check_parameters(t_config *config, int ret)
 {
-	if (!*config->tx_ea)
+	if (!*config->tx_ea || !check_texture_file(config->tx_ea))
 		ret = -6;
-	else if (!*config->tx_so)
+	else if (!*config->tx_so || !check_texture_file(config->tx_so))
 		ret = -6;
-	else if (!*config->tx_we)
+	else if (!*config->tx_we || !check_texture_file(config->tx_we))
 		ret = -6;
-	else if (!*config->tx_no)
+	else if (!*config->tx_no || !check_texture_file(config->tx_no))
 		ret = -6;
-	else if (!*config->tx_sprite)
+	else if (!*config->tx_sprite || !check_texture_file(config->tx_sprite))
 		ret = -6;
-	else if (config->res_x < 1)
+	else if (config->res_x < 1 || config->res_y < 1)
 		ret = -6;
-	else if (config->res_y < 1)
-		ret = -6;
-	else if (config->c_saved < 1)
-		ret = -6;
-	else if (config->f_saved < 1)
+	else if (config->c_saved < 1 || config->f_saved < 1)
 		ret = -6;
 	return (ret);
 }

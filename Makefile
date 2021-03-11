@@ -18,6 +18,7 @@ SRCS = srcs/raycasting.c \
 		srcs/init_parsing.c \
 		srcs/parsing_config.c \
 		srcs/parsing_config2.c \
+		srcs/parsing_config3.c \
 		srcs/parsing_map.c \
 		srcs/parsing_main.c \
 		utils/utils_1.c \
@@ -34,9 +35,7 @@ MLX_REQ_LN = -Lmlx_linux -lmlx_Linux -Imlx_linux -lXext -lX11 -lm
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror
-
-DEBUG = -g
+CFLAGS = -Wall -Wextra -Werror -g
 
 LIB = -L./libft/ -lft
 
