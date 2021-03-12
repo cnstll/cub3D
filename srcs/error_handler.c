@@ -22,6 +22,8 @@ void	error_handler(int error)
 		printf("Invalid or missing input file\n");
 	else if (error == -9)
 		printf("Invalid or missing argument\n");
-	else if (error < -9)
+	else if (error == -10)
+		printf("Texture file format not supported\n");
+	else if (error < -10)
 		printf("Unexpected error\n");
 }

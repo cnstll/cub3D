@@ -39,4 +39,3 @@ void	move_right(t_ray *ray, int **world)
 				[(int)(ray->pos_y + ray->plane_y * ray->ms)] == 0)
 		ray->pos_y += ray->plane_y * ray->ms;
 }
-

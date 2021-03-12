@@ -13,10 +13,11 @@ int	check_res(char *p, int start)
 	{
 		if (ft_isdigit(p[j]) == 1 && space < 2)
 			j++;
-		else if (p[j] == ' ' && space == 0)
+		else if (p[j++] == ' ' && space == 0)
 		{
+			if (ft_isdigit(p[j]) != 1)
+				return (-1);
 			space++;
-			j++;
 		}
 		else
 			return (-1);
@@ -61,7 +62,11 @@ int	check_color(char *p, int start)
 		if (ft_isdigit(p[j]) == 1 && comma < 3)
 			j++;
 		else if (p[j++] == ',' && comma < 2)
+		{
+			if (ft_isdigit(p[j]) != 1)
+				return (-1);
 			comma++;
+		}
 		else
 			return (-1);
 	}

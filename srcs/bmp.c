@@ -1,4 +1,3 @@
-
 #include "../includes/cube.h"
 
 static void	init_head(t_head *head, t_bimg *bimg)
@@ -41,7 +40,7 @@ static void	write_pixels(int pitch, t_bimg *bimg, int fd)
 			bgr_pix[0] = p.b;
 			bgr_pix[1] = p.g;
 			bgr_pix[2] = p.r;
-			write(fd, &bgr_pix ,3);
+			write(fd, &bgr_pix, 3);
 			j++;
 		}
 		bgr_pix[0] = 0;
@@ -52,13 +51,13 @@ static void	write_pixels(int pitch, t_bimg *bimg, int fd)
 	}
 }
 
-static int	save_img(t_bimg* bimg, const char *file)
+static int	save_img(t_bimg *bimg, const char *file)
 {
-	t_head	head;
-	int		pitch;
-	int		data_size;
-	char	corrpitch[4] = {0,3,2,1};
-	int		fd;
+	t_head		head;
+	int			pitch;
+	int			data_size;
+	static char	corrpitch[4] = {0, 3, 2, 1};
+	int			fd;
 
 	fd = open(file, O_CREAT|O_RDWR, S_IRWXU|S_IRWXG);
 	if (fd < 0)

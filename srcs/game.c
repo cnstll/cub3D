@@ -2,33 +2,47 @@
 
 int play(t_data *data)
 {
+	int	r;
+
+	r = 1;
 	init_buffer(data);
 	init_mlx_window(data);
 	init_img(data);
 	init_ray(data);
-	init_textures(data);
+	if (init_textures(data) == -1)
+		r = -10;
 	init_map(data);
 	init_inputs(data);
-	render_next_frame(data);
-	mlx_hook(data->win, 2, 1L<<0, &key_press, data);
-	mlx_hook(data->win, 3, 1L<<1, &key_release, data);
-	mlx_hook(data->win, 33, 1L << 17, &mlx_loop_end, data->mlx);
-	mlx_loop_hook(data->mlx, &handle_player_move, data);
-	mlx_loop(data->mlx);
+	if (r == 1)
+	{
+		render_next_frame(data);
+		mlx_hook(data->win, 2, 1L<<0, &key_press, data);
+		mlx_hook(data->win, 3, 1L<<1, &key_release, data);
+		mlx_hook(data->win, 33, 1L << 17, &mlx_loop_end, data->mlx);
+		mlx_loop_hook(data->mlx, &handle_player_move, data);
+		mlx_loop(data->mlx);
+	}
 	free_and_destroy_play(data);
-	return (1);
+	return (r);
 }
 
 int	save(t_data *data)
 {
+	int r;
+
+	r = 1;
 	init_buffer(data);
 	init_ray(data);
-	init_textures(data);
+	if (init_textures(data) == -1)
+		r = -10;
 	init_map(data);
-	cast_img(data, data->ray);
-	copy_buffer_to_bimg(data, data->buffer);
+	if (r == 1)
+	{
+		cast_img(data, data->ray);
+		copy_buffer_to_bimg(data, data->buffer);
+	}
 	free_and_destroy_save(data);
-	return (1);
+	return (r);
 }
 
 int extract_config_elements(t_data *data, char *file_path)
@@ -64,7 +78,7 @@ int main(int argc, char *argv[])
 	{
 		r = extract_config_elements(data, argv[1]);
 		if (r >= 0)
-			play(data);
+			r = play(data);
 	}
 	else if (argc == 3)
 	{
@@ -73,7 +87,7 @@ int main(int argc, char *argv[])
 		if (r >= 0)
 			r = extract_config_elements(data, argv[1]);
 		if (r >= 0 && data->save == 0)
-			save(data);
+			r = save(data);
 	}
 	else
 		r = -9;

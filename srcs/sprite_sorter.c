@@ -30,7 +30,7 @@ static void	swap_sp(t_sp *a, t_sp *b)
 	*b = tmp;
 }
 
-void	bubble_sort(t_sprite *sprite, double *array, int size)
+void		bubble_sort(t_sprite *sprite, double *array, int size)
 {
 	int i;
 	int	done;
@@ -55,4 +55,3 @@ void	bubble_sort(t_sprite *sprite, double *array, int size)
 			done = 0;
 	}
 }
-

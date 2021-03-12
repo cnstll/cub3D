@@ -15,6 +15,8 @@ int load_textures(t_data *data, t_img **textures)
 		textures[x]->img = mlx_xpm_file_to_image(
 				data->mlx, textures[x]->file_paths,
 				&textures[x]->width, &textures[x]->height);
+		if (!textures[x]->img)
+			return (-1);
 		textures[x]->addr = (int *)mlx_get_data_addr(
 				textures[x]->img, &textures[x]->bpp,
 				&textures[x]->line_len, &textures[x]->endian);
@@ -26,14 +28,16 @@ int load_textures(t_data *data, t_img **textures)
 int init_textures(t_data *data)
 {
 	int x;
+	int r;
 
 	x = 0;
+	r = 1;
 	data->textures = malloc(sizeof(t_img *) * 5);
 	while (x < 5)
 	{
 		data->textures[x] = malloc(sizeof(t_img));
 		x++;
 	}
-	load_textures(data, data->textures);
-	return (1);
+	r = load_textures(data, data->textures);
+	return (r);
 }

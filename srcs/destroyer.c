@@ -31,7 +31,15 @@ void	destroy_textures(t_data *data)
 	x = 0;
 	while (x < 5)
 	{
-		mlx_destroy_image(data->mlx, data->textures[x]->img);
+		if (!data->textures[x]->img)
+			break;
+		else
+			mlx_destroy_image(data->mlx, data->textures[x]->img);
+		x++;
+	}
+	x = 0;
+	while (x < 5)
+	{
 		free(data->textures[x]->file_paths);
 		free(data->textures[x]);
 		x++;
