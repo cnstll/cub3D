@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing_config2.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:34:16 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:42:14 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-int	check_path(char *p, int start)
+int		check_path(char *p, int start)
 {
 	int j;
 
@@ -11,7 +23,8 @@ int	check_path(char *p, int start)
 		{
 			if (p[j] == '.' && ft_strncmp(p + j, ".xpm", 5) != 0)
 				return (-1);
-			else if (p[j] == '/' && (ft_isalpha(p[j + 1]) == 0 || p[j + 1] == '.'))
+			else if (p[j] == '/'
+				&& (ft_isalpha(p[j + 1]) == 0 || p[j + 1] == '.'))
 				return (-1);
 			j++;
 		}
@@ -21,7 +34,7 @@ int	check_path(char *p, int start)
 	return (1);
 }
 
-int	copy_path(char *p, t_config *config, int start)
+int		copy_path(char *p, t_config *config, int start)
 {
 	config->count_param++;
 	if (p[0] == 'E' && p[1] == 'A' && !*config->tx_ea)
@@ -37,7 +50,7 @@ int	copy_path(char *p, t_config *config, int start)
 	return (0);
 }
 
-int valid_elements_pair(char e1, char e2)
+int		valid_elements_pair(char e1, char e2)
 {
 	if (c_in_s(e1, "RFC") > 0 && e2 == ' ')
 		return (1);
@@ -53,7 +66,7 @@ int valid_elements_pair(char e1, char e2)
 		return (-1);
 }
 
-int	check_parameters(t_config *config, int ret)
+int		check_parameters(t_config *config, int ret)
 {
 	if (!*config->tx_ea || !check_texture_file(config->tx_ea))
 		ret = -6;
@@ -72,7 +85,7 @@ int	check_parameters(t_config *config, int ret)
 	return (ret);
 }
 
-int check_if_map(char *line, int num_line, t_config *config)
+int		check_if_map(char *line, int num_line, t_config *config)
 {
 	int i;
 

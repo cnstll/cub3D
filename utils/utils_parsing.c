@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_parsing.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 17:04:48 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 17:06:42 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 unsigned long	rgb_to_hex(int r, int g, int b)
 {
-    unsigned int	u;
+	unsigned int	u;
 
 	u = ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
 	return (u);
@@ -17,7 +29,7 @@ int				map_max_width(char **map, int start)
 	i = start;
 	while (map[i])
 	{
-		max = (int)(fmax(ft_strlen(map[i]),max));
+		max = (int)(fmax(ft_strlen(map[i]), max));
 		i++;
 	}
 	return (max);
@@ -51,10 +63,10 @@ int				check_filepath(char *file_path)
 
 char			*file_to_str(char *path_file)
 {
-	int fd;
-	char buf[READ_SIZE + 1];
-	char *tmp;
-	int r;
+	int		fd;
+	char	buf[32 + 1];
+	char	*tmp;
+	int		r;
 
 	fd = 0;
 	fd = open(path_file, O_RDONLY);

@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raycasting_utils.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 16:45:02 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 16:47:37 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-void    ray_initiation(t_ray *ray, int stripes, int max_stripes)
+void	ray_initiation(t_ray *ray, int stripes, int max_stripes)
 {
 	ray->camera_x = 2 * stripes / (double)(max_stripes) - 1;
 	ray->ray_dir_x = ray->dir_x + ray->plane_x * ray->camera_x;
@@ -78,10 +90,10 @@ void	calculate_wall_dist(t_ray *ray, t_data *data)
 			/ ray->ray_dir_y;
 	ray->line_h = (int)(data->screen_ht / ray->wall_dist);
 	ray->start = -ray->line_h / 2 + data->screen_ht / 2;
-	if(ray->start < 0)
+	if (ray->start < 0)
 		ray->start = 0;
 	ray->end = ray->line_h / 2 + data->screen_ht / 2;
-	if(ray->end >= data->screen_ht || ray->end < 0)
+	if (ray->end >= data->screen_ht || ray->end < 0)
 		ray->end = data->screen_ht - 1;
 	if (ray->side == 0)
 		ray->wall_hit = ray->pos_y + ray->wall_dist * ray->ray_dir_y;
@@ -96,11 +108,11 @@ void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s)
 	int	c;
 	int tx_n;
 
-	if(ray->side == 0 && ray->ray_dir_x < 0)
+	if (ray->side == 0 && ray->ray_dir_x < 0)
 		tx_n = 0;
 	else if (ray->side == 0 && ray->ray_dir_x > 0)
 		tx_n = 1;
-	else if(ray->side == 1 && ray->ray_dir_y < 0)
+	else if (ray->side == 1 && ray->ray_dir_y < 0)
 		tx_n = 2;
 	else
 		tx_n = 3;
@@ -115,7 +127,6 @@ void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s)
 		ray->tx_y = (int)(ray->tx_pos) & (textures[tx_n]->height - 1);
 		ray->tx_pos += ray->step;
 		c = textures[tx_n]->addr[textures[tx_n]->width * ray->tx_y + ray->tx_x];
-		data->buffer[lines][s] = c;
-		lines++;
+		data->buffer[lines++][s] = c;
 	}
 }

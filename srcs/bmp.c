@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bmp.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 17:07:25 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 17:07:38 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-static void	init_head(t_head *head, t_bimg *bimg)
+static void		init_head(t_head *head, t_bimg *bimg)
 {
 	head->signature[0] = 'B';
 	head->signature[1] = 'M';

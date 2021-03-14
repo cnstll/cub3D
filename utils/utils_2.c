@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/24 11:00:21 by calle             #+#    #+#             */
-/*   Updated: 2021/02/24 15:12:42 by calle            ###   ########.fr       */
+/*   Created: 2021/03/14 16:55:56 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 16:56:19 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 void	free_2d_string(char **s)
@@ -18,11 +19,10 @@ void	free_2d_string(char **s)
 	i = 0;
 	while (s[i])
 		free(s[i++]);
-	//free(s[i]);
 	free(s);
 }
 
-void free_2d_array(int **array, int num_lines)
+void	free_2d_array(int **array, int num_lines)
 {
 	int	i;
 
@@ -35,7 +35,7 @@ void free_2d_array(int **array, int num_lines)
 	free(array);
 }
 
-int	**malloc_2d_array(int **array, int size, int lines)
+int		**malloc_2d_array(int **array, int size, int lines)
 {
 	int	i;
 
@@ -51,20 +51,4 @@ int	**malloc_2d_array(int **array, int size, int lines)
 		i++;
 	}
 	return (array);
-}
-
-int	ft_isalpha(int c)
-{
-	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
-		return (1);
-	else
-		return (0);
-}
-
-int	ft_isdigit(int c)
-{
-	if (c >= 48 && c <= 57)
-		return (1);
-	else
-		return (0);
 }

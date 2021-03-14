@@ -6,29 +6,13 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/24 15:37:53 by calle             #+#    #+#             */
-/*   Updated: 2021/02/26 19:01:33 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/14 17:02:04 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cube.h"
 
-char			*ft_strdup(const char *s)
-{
-	char			*dup;
-	unsigned int	i;
-
-	i = 0;
-	if (!(dup = malloc(sizeof(char) * (ft_strlen(s) + 1))))
-		return (NULL);
-	while (i <= ft_strlen(s))
-	{
-		dup[i] = s[i];
-		i++;
-	}
-	return (dup);
-}
-
-char			*ft_str_append(char *s, char c)
+char	*ft_str_append(char *s, char c)
 {
 	unsigned int	len;
 	char			*r;
@@ -52,7 +36,7 @@ char			*ft_str_append(char *s, char c)
 	return (r);
 }
 
-int				ft_lite_atoi(const char *s)
+int		ft_lite_atoi(const char *s)
 {
 	char	*nbr;
 	int		n;
@@ -72,7 +56,7 @@ int				ft_lite_atoi(const char *s)
 	return (n);
 }
 
-char **ft_lite_split(char *s, char c)
+char	**ft_lite_split(char *s, char c)
 {
 	char	**ret;
 	int		j;
@@ -86,8 +70,7 @@ char **ft_lite_split(char *s, char c)
 		if (s[j++] == c)
 			n_sep++;
 	j = 0;
-	ret = (char **)malloc(sizeof(char *) * (n_sep + 2));
-	if (ret == NULL)
+	if (!(ret = (char **)malloc(sizeof(char *) * (n_sep + 2))))
 		return (NULL);
 	while (j <= n_sep)
 	{
@@ -100,23 +83,4 @@ char **ft_lite_split(char *s, char c)
 	}
 	ret[j] = 0;
 	return (ret);
-}
-
-int			ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	unsigned int	i;
-
-	i = 0;
-	s1 = (char*)s1;
-	s2 = (char*)s2;
-	if (n == 0)
-		return (0);
-	while ((s1[i] == s2[i]) && (s1[i] != '\0' && s2[i] != '\0') && (i < n - 1))
-		i++;
-	if ((s1[i] > s2[i]) || (s1[i] != '\0' && s2[i] == '\0'))
-		return (1);
-	else if ((s1[i] < s2[i]) || (s1[i] == '\0' && s2[i] != '\0'))
-		return (-1);
-	else
-		return (0);
 }

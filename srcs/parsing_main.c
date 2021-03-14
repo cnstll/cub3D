@@ -1,27 +1,37 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing_main.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 16:39:58 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 16:42:42 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 static int	map_pre_parsing(char **map, int start)
 {
-	int i;
 	int j;
 	int num_of_init_pos;
 
-	i = start;
 	num_of_init_pos = 0;
 	if (!map)
 		return (-1);
-	while (map[i])
+	while (map[start])
 	{
 		j = 0;
-		while (map[i][j])
+		while (map[start][j])
 		{
-			if (c_in_s(map[i][j], " 012NSEW") == 0)
+			if (c_in_s(map[start][j], " 012NSEW") == 0)
 				return (-2);
-			if (c_in_s(map[i][j], "NSEW") == 1)
+			if (c_in_s(map[start][j], "NSEW") == 1)
 				num_of_init_pos++;
 			j++;
 		}
-		i++;
+		start++;
 	}
 	if (num_of_init_pos > 1)
 		return (-2);
@@ -34,16 +44,12 @@ static void	str_to_array(char **src, int **dest, t_data *data, int s)
 {
 	int i;
 	int j;
-	int	max_height;
-	int	max_width;
 
 	i = 0;
-	max_height = data->world_ht;
-	max_width = data->world_wd;
-	while (i < max_height)
+	while (i < data->world_ht)
 	{
 		j = 0;
-		while (j < max_width)
+		while (j < data->world_wd)
 		{
 			if (src[i + s][j] && c_in_s(src[i + s][j], "012") == 1)
 				dest[i][j] = src[i + s][j] - '0';

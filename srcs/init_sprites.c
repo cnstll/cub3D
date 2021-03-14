@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_sprites.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:22:55 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:23:54 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-int	find_sprite_num(t_data *data)
+int		find_sprite_num(t_data *data)
 {
 	int	r;
 	int	i;
@@ -36,14 +48,15 @@ void	find_sprite_pos(t_data *data, t_sprite *sprite)
 		while (j < data->world_wd && r < sprite->num)
 		{
 			if (data->world[i][j] == 2)
-				sprite->sp[r++] = (t_sp){(double)(i) + 0.5, (double)(j) + 0.5, 4};
+				sprite->sp[r++] =
+					(t_sp){(double)(i) + 0.5, (double)(j) + 0.5, 4};
 			j++;
 		}
 		i++;
 	}
 }
 
-int	init_map(t_data *data)
+int		init_map(t_data *data)
 {
 	data->sprite = malloc(sizeof(t_sprite));
 	data->sprite->num = find_sprite_num(data);
@@ -53,4 +66,3 @@ int	init_map(t_data *data)
 	find_sprite_pos(data, data->sprite);
 	return (1);
 }
-

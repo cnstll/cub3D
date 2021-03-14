@@ -6,23 +6,11 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/24 10:24:38 by calle             #+#    #+#             */
-/*   Updated: 2021/02/26 19:46:08 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/14 16:53:12 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cube.h"
-
-size_t		ft_strlen(const char *s)
-{
-	int		i;
-
-	i = 0;
-	if (!s)
-		return (0);
-	while (s[i])
-		i++;
-	return (i);
-}
 
 char	*ft_strjoin_free(char *s1, char *s2)
 {
@@ -48,17 +36,6 @@ char	*ft_strjoin_free(char *s1, char *s2)
 	if (s1)
 		free(s1);
 	return (d);
-}
-void	ft_bzero(void *s, size_t n)
-{
-	unsigned int	i;
-
-	i = 0;
-	while (i < n)
-	{
-		((char *)s)[i] = 0;
-		i++;
-	}
 }
 
 int		c_in_s(char c, char *s)
@@ -95,4 +72,3 @@ char	*ft_strdup_till_char(char *s, char c, int start)
 	dup[i] = '\0';
 	return (dup);
 }
-

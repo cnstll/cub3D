@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   game.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:16:06 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:19:53 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-int play(t_data *data)
+int	play(t_data *data)
 {
 	int	r;
 
@@ -16,8 +28,8 @@ int play(t_data *data)
 	if (r == 1)
 	{
 		render_next_frame(data);
-		mlx_hook(data->win, 2, 1L<<0, &key_press, data);
-		mlx_hook(data->win, 3, 1L<<1, &key_release, data);
+		mlx_hook(data->win, 2, 1L << 0, &key_press, data);
+		mlx_hook(data->win, 3, 1L << 1, &key_release, data);
 		mlx_hook(data->win, 33, 1L << 17, &mlx_loop_end, data->mlx);
 		mlx_loop_hook(data->mlx, &handle_player_move, data);
 		mlx_loop(data->mlx);
@@ -45,7 +57,7 @@ int	save(t_data *data)
 	return (r);
 }
 
-int extract_config_elements(t_data *data, char *file_path)
+int	extract_config_elements(t_data *data, char *file_path)
 {
 	char	*tmp;
 	char	**param;
@@ -65,15 +77,13 @@ int extract_config_elements(t_data *data, char *file_path)
 	return (r);
 }
 
-
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
 	t_data	*data;
 	int		r;
 
 	data = malloc(sizeof(t_data));
 	init_config(data);
-	data->save = 0;
 	if (argc == 2)
 	{
 		r = extract_config_elements(data, argv[1]);
@@ -83,7 +93,7 @@ int main(int argc, char *argv[])
 	else if (argc == 3)
 	{
 		if ((data->save = ft_strncmp(argv[2], "--save", 7)) != 0)
-			r = -9;	
+			r = -9;
 		if (r >= 0)
 			r = extract_config_elements(data, argv[1]);
 		if (r >= 0 && data->save == 0)

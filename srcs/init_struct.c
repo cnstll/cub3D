@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_struct.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:24:05 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 16:25:37 by user42           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 int		init_buffer(t_data *data)
@@ -35,22 +47,22 @@ int		init_mlx_window(t_data *data)
 	return (1);
 }
 
-
 int		init_img(t_data *data)
 {
 	data->img = malloc(sizeof(t_img));
 	data->img->img =
 		mlx_new_image(data->mlx, data->screen_wd, data->screen_ht);
 	data->img->addr = (int *)mlx_get_data_addr(
-			data->img->img, &data->img->bpp, &data->img->line_len, &data->img->endian);
+			data->img->img, &data->img->bpp,
+			&data->img->line_len, &data->img->endian);
 	return (1);
 }
 
 int		init_ray(t_data *data)
 {
 	data->ray = malloc(sizeof(t_ray));
-	data->ray->pos_x = data->config->init_pos_x;
-	data->ray->pos_y = data->config->init_pos_y;
+	data->ray->pos_x = data->config->init_pos_x + 0.5;
+	data->ray->pos_y = data->config->init_pos_y + 0.5;
 	data->ray->ms = 0.05;
 	data->ray->rs = 0.04;
 	data->ray->dir_x = data->config->init_dir_x;

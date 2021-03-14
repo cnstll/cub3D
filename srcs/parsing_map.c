@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing_map.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 16:43:21 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 static int	apply_golden_rule(char **map, int i, int j)
@@ -109,4 +121,3 @@ int			check_map_golden_rule(char **map, int start)
 	}
 	return (r);
 }
-

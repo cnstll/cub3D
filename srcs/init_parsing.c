@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_parsing.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:20:17 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:22:32 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 void	init_player_dir(t_config *config, double rot)
@@ -6,42 +18,35 @@ void	init_player_dir(t_config *config, double rot)
 	double old_plane_x;
 
 	old_dir_x = config->init_dir_x;
-	config->init_dir_x = 
+	config->init_dir_x =
 		config->init_dir_x * cos(rot) - config->init_dir_y * sin(rot);
-	config->init_dir_y = 
+	config->init_dir_y =
 		old_dir_x * sin(rot) + config->init_dir_y * cos(-rot);
 	old_plane_x = config->init_plane_x;
-	config->init_plane_x = 
+	config->init_plane_x =
 		config->init_plane_x * cos(rot) - config->init_plane_y * sin(rot);
-	config->init_plane_y = 
+	config->init_plane_y =
 		old_plane_x * sin(rot) + config->init_plane_y * cos(rot);
-
 }
 
 void	init_player(char dir, int x, int y, t_config *config)
 {
 	config->init_pos_x = x;
 	config->init_pos_y = y;
-
 	if (dir == 'N')
 		;
 	else if (dir == 'S')
-	{
 		init_player_dir(config, M_PI);
-	}
 	else if (dir == 'W')
-	{
-		init_player_dir(config, M_PI/2);
-	}
+		init_player_dir(config, M_PI / 2);
 	else
-	{
-		init_player_dir(config, 3 * M_PI/2);
-	}
+		init_player_dir(config, 3 * M_PI / 2);
 }
 
-void init_config(t_data *data)
+void	init_config(t_data *data)
 {
 	data->config = malloc(sizeof(t_config));
+	data->save = 0;
 	data->config->res_x = 0;
 	data->config->res_y = 0;
 	data->config->tx_no = "";

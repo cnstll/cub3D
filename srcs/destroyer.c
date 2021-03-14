@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   destroyer.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:11:22 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:11:26 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
 void	destroy_config(t_data *data, t_config *config)
@@ -32,7 +44,7 @@ void	destroy_textures(t_data *data)
 	while (x < 5)
 	{
 		if (!data->textures[x]->img)
-			break;
+			break ;
 		else
 			mlx_destroy_image(data->mlx, data->textures[x]->img);
 		x++;

@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_textures.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:27:47 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:29:02 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-int load_textures(t_data *data, t_img **textures)
+static int	load_textures(t_data *data, t_img **textures)
 {
 	int x;
 
@@ -22,10 +34,10 @@ int load_textures(t_data *data, t_img **textures)
 				&textures[x]->line_len, &textures[x]->endian);
 		x++;
 	}
-	return(1);
+	return (1);
 }
 
-int init_textures(t_data *data)
+int			init_textures(t_data *data)
 {
 	int x;
 	int r;

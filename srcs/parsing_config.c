@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing_config.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/14 15:30:15 by calle             #+#    #+#             */
+/*   Updated: 2021/03/14 15:33:22 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/cube.h"
 
-int	check_res(char *p, int start)
+int		check_res(char *p, int start)
 {
 	int j;
 	int space;
@@ -25,7 +37,7 @@ int	check_res(char *p, int start)
 	return (1);
 }
 
-int	copy_res(char *p, t_config *config, int start)
+int		copy_res(char *p, t_config *config, int start)
 {
 	int		j;
 	char	*tmp;
@@ -48,7 +60,7 @@ int	copy_res(char *p, t_config *config, int start)
 	return (0);
 }
 
-int	check_color(char *p, int start)
+int		check_color(char *p, int start)
 {
 	int j;
 	int comma;
@@ -73,12 +85,12 @@ int	check_color(char *p, int start)
 	return (1);
 }
 
-int	copy_color(char *p, t_config *config, int start)
+int		copy_color(char *p, t_config *config, int start)
 {
-	int r;
-	int g;
-	int b;
-	char **tmp;
+	int		r;
+	int		g;
+	int		b;
+	char	**tmp;
 
 	tmp = ft_lite_split(p + start, ',');
 	r = ft_lite_atoi(tmp[0]);
@@ -86,9 +98,9 @@ int	copy_color(char *p, t_config *config, int start)
 	b = ft_lite_atoi(tmp[2]);
 	free_2d_string(tmp);
 	if (p[0] == 'F')
-		config->f_color = rgb_to_hex(r,g,b);
+		config->f_color = rgb_to_hex(r, g, b);
 	if (p[0] == 'C')
-		config->c_color = rgb_to_hex(r,g,b);
+		config->c_color = rgb_to_hex(r, g, b);
 	if (p[0] == 'F')
 		config->f_saved++;
 	if (p[0] == 'C')
@@ -115,11 +127,11 @@ void	parse_param_line(char *p, t_config *config)
 			i++;
 		else if (p[i] == '.' && p[i + 1] == '/' && check_path(p, i + 2) == 1)
 			done = copy_path(p, config, i);
-		else if(p[0] == 'R' && ft_isdigit(p[i]) && check_res(p, i) == 1)
+		else if (p[0] == 'R' && ft_isdigit(p[i]) && check_res(p, i) == 1)
 			done = copy_res(p, config, i);
-		else if(p[0] == 'C' && ft_isdigit(p[i]) && check_color(p, i) == 1)
+		else if (p[0] == 'C' && ft_isdigit(p[i]) && check_color(p, i) == 1)
 			done = copy_color(p, config, i);
-		else if(p[0] == 'F' && ft_isdigit(p[i]) && check_color(p, i) == 1)
+		else if (p[0] == 'F' && ft_isdigit(p[i]) && check_color(p, i) == 1)
 			done = copy_color(p, config, i);
 		else
 			return ;
