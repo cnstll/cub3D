@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:16:06 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 15:19:53 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/15 12:19:07 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	extract_config_elements(t_data *data, char *file_path)
 	if (!tmp || check_filepath(file_path) < 1)
 		return (-8);
 	param = ft_lite_split(tmp, '\n');
+//	param = ft_split(tmp, '\n');
 	free(tmp);
 	r = parsing_parameters(param, data->config);
 	if (r >= 0)

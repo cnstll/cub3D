@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 17:04:48 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 17:06:42 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/15 12:18:37 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int				check_filepath(char *file_path)
 char			*file_to_str(char *path_file)
 {
 	int		fd;
-	char	buf[32 + 1];
+	char	buf[READ_SIZE + 1];
 	char	*tmp;
 	int		r;
 
@@ -82,6 +82,7 @@ char			*file_to_str(char *path_file)
 		if (r > 0)
 			tmp = ft_strjoin_free(tmp, buf);
 	}
+	tmp = ft_strjoin(tmp, "\n1\n");
 	close(fd);
 	return (tmp);
 }

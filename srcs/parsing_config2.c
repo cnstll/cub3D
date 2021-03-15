@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:34:16 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 15:42:14 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/15 17:18:36 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,7 @@ int		check_path(char *p, int start)
 	{
 		if (ft_isalpha(p[j]) == 1 || p[j] == '_' || p[j] == '/' || p[j] == '.')
 		{
-			if (p[j] == '.' && ft_strncmp(p + j, ".xpm", 5) != 0)
-				return (-1);
-			else if (p[j] == '/'
+			if (p[j] == '/'
 				&& (ft_isalpha(p[j + 1]) == 0 || p[j + 1] == '.'))
 				return (-1);
 			j++;
