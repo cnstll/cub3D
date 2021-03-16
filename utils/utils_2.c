@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:55:56 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 16:56:19 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/16 12:45:05 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,43 @@ void	free_2d_array(int **array, int num_lines)
 		i++;
 	}
 	free(array);
+}
+
+char	**calloc_2d_str(int size, int lines)
+{
+	int	i;
+	char **str;
+
+	i = 0;
+	str = (char **)ft_calloc(lines + 1, sizeof(char *));
+	if (!str)
+		return (NULL);
+	while (i < lines)
+	{
+		str[i] = (char *)ft_calloc(size + 1, sizeof(char));
+		if (!str[i])
+			return (NULL);
+		i++;
+	}
+	return (str);
+}
+
+void	copy_2d_str(char **srcs, char **dest, int start, t_data *data)
+{
+	int	i;
+	int	j;
+
+	j = 0;
+	while (j < data->world_ht)
+	{
+		i = 0;
+		while (i < data->world_wd)
+		{
+			dest[j][i] = srcs[start + j][i];
+			i++;
+		}
+		j++;
+	}
 }
 
 int		**malloc_2d_array(int **array, int size, int lines)

@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:39:58 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 16:42:42 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/16 17:23:06 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,33 @@ static void	str_to_array(char **src, int **dest, t_data *data, int s)
 	}
 }
 
+int			check_empty_lines(char **map, t_data *data)
+{
+	int j;
+	int i;
+	int	l1;
+	int	l2;
+	int	l3;
+
+	i = 0;
+	l1 = 0;
+	l2 = 0;
+	l3 = 0;
+	while (i < data->world_ht - 2)
+	{
+		j = 0;
+		while (map[i][j] && j < data->world_wd)
+		{
+			l1 = 1;
+			j++;
+		}
+		i++;
+		if (l1 == 1 && l2 == 0 && l3 == 1)
+			return (-7); 
+	}
+	return (1); 
+}
+
 int			parsing_parameters(char **line, t_config *config)
 {
 	int i;
@@ -92,17 +119,24 @@ int			parsing_parameters(char **line, t_config *config)
 int			parsing_map(char **map, t_data *data, int start)
 {
 	int	r;
+	char **tmp;
 
 	r = 0;
 	r = map_pre_parsing(map, start);
 	if (r < 0)
 		return (r);
-	r = check_map_golden_rule(map, start);
-	if (r < 0)
-		return (r);
 	data->world_wd = map_max_width(map, start);
 	data->world_ht = map_max_height(map, start);
+	tmp = calloc_2d_str(data->world_wd, data->world_ht);
+	copy_2d_str(map, tmp, start, data);
+	//r = check_empty_lines(tmp, data);
+	//if (r < 0)
+	//	return (r);
+	r = check_map_golden_rule(tmp, 0);
+	if (r < 0)
+		return (r);
 	data->world = malloc_2d_array(data->world, data->world_wd, data->world_ht);
-	str_to_array(map, data->world, data, start);
+	str_to_array(tmp, data->world, data, 0);
+	free_2d_string(tmp);
 	return (r);
 }

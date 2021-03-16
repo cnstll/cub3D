@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
-/*   Updated: 2021/03/16 17:00:35 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/16 15:01:20 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,26 @@ static int	apply_golden_rule(char **map, int i, int j)
 {
 	if (c_in_s(map[i - 1][j - 1], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i - 1][j], " 1") == 0)
+	if (c_in_s(map[i - 1][j], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i - 1][j + 1], " 1") == 0)
+	if (c_in_s(map[i - 1][j + 1], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i][j - 1], " 1") == 0)
+	if (c_in_s(map[i][j - 1], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i][j + 1], " 1") == 0)
+	if (c_in_s(map[i][j + 1], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i + 1][j - 1], " 1") == 0)
+	if (c_in_s(map[i + 1][j - 1], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i + 1][j], " 1") == 0)
+	if (c_in_s(map[i + 1][j], " 1") == 0)
 		return (-7);
-	else if (c_in_s(map[i + 1][j + 1], " 1") == 0)
+	if (c_in_s(map[i + 1][j + 1], " 1") == 0)
 		return (-7);
 	return (1);
 }
 
 static int	check_n_w(char **map, int i, int j, int start)
 {
-	if (i - start == 0 && map[i][j] == ' ')
+	if ((i - start == 0 || !map[i - 1][j]) && map[i][j] == ' ')
 	{
 		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
 			return (-7);
@@ -44,7 +44,7 @@ static int	check_n_w(char **map, int i, int j, int start)
 		if (map[i + 1][j + 1] && !c_in_s(map[i + 1][j + 1], " 1"))
 			return (-7);
 	}
-	else if (j == 0 && map[i][j] == ' ')
+	else if ((j == 0 || !map[i][j - 1]) && map[i][j] == ' ')
 	{
 		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
 			return (-7);
@@ -60,17 +60,8 @@ static int	check_borders(char **map, int i, int j, int start)
 {
 	if (!c_in_s(map[i][j], " 1") && map[i][j])
 		return (-7);
-	if ((j == 0 || i - start == 0))
+	if ((j == 0 || i - start == 0 || !map[i - 1][j] || !map[i][j - 1]) && map[i][j] == ' ')
 		return (check_n_w(map, i, j, start));
-	else if (!map[i - 1][j] && map[i][j] == ' ')
-	{
-		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
-			return (-7);
-		if (map[i + 1][j] && !c_in_s(map[i + 1][j], " 1"))
-			return (-7);
-		if (map[i + 1][j + 1] && !c_in_s(map[i + 1][j + 1], " 1"))
-			return (-7);
-	}
 	else if (!map[i][j + 1] && map[i][j] == ' ')
 	{
 		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
@@ -96,13 +87,13 @@ static int	is_border(char **map, int i, int j, int start)
 {
 	if (j == 0 || i - start == 0)
 		return (1);
-	else if (!map[i - 1][j - 1] || !map[i - 1][j] || !map[i - 1][j + 1])
+	if (!map[i - 1][j - 1] || !map[i - 1][j] || !map[i - 1][j + 1])
 		return (1);
-	else if (!map[i + 1][j - 1] || !map[i + 1][j] || !map[i + 1][j + 1])
+	if (!map[i + 1][j - 1] || !map[i + 1][j] || !map[i + 1][j + 1])
 		return (1);
-	else if (!map[i][j - 1] || !map[i - 1][j - 1] || !map[i + 1][j - 1])
+	if (!map[i][j - 1] || !map[i - 1][j - 1] || !map[i + 1][j - 1])
 		return (1);
-	else if (!map[i][j + 1] || !map[i - 1][j + 1] || !map[i + 1][j + 1])
+	if (!map[i][j + 1] || !map[i - 1][j + 1] || !map[i + 1][j + 1])
 		return (1);
 	return (-1);
 }
@@ -115,6 +106,12 @@ int			check_map_golden_rule(char **map, int start)
 
 	i = start;
 	r = 1;
+/*	while (map[i])
+	{
+		printf("%2d-- %.167s\n", i, map[i]);
+		i++;
+	}*/
+	i = start;
 	while (map[i] && r == 1)
 	{
 		j = 0;
@@ -124,6 +121,24 @@ int			check_map_golden_rule(char **map, int start)
 				r = apply_golden_rule(map, i, j);
 			else if (is_border(map, i, j, start) > 0)
 				r = check_borders(map, i, j, start);
+//			if (r != 1)
+//			{
+/*				printf("is_border = %d\n", is_border(map, i, j, start));
+				printf("start = %d <> i = %d <> j = %d <> map = '%c'\n", start, i, j, map[i][j]);
+				write(1, &map[i-1][j], 1);
+				write(1, &"\n", 1);
+				write(1, &map[i+1][j], 1);
+				write(1, &"\n", 1);
+				write(1, &map[i][j-1], 1);
+				write(1, &"\n", 1);
+				write(1, &map[i][j+1], 1);
+				write(1, &"\n", 1);
+				printf("i = %d <> j = %d <> map = '%c'\n", i - 1, j, map[i - 1][j]);
+				printf("i = %d <> j = %d <> map = '%c'\n", i + 1, j, map[i + 1][j]);
+				printf("i = %d <> j = %d <> map = '%c'\n", i, j - 1, map[i][j - 1]);
+				printf("i = %d <> j = %d <> map = '%c'\n", i, j + 1, map[i][j + 1]);*/
+//
+			//}
 			j++;
 		}
 		i++;

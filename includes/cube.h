@@ -30,6 +30,8 @@ char	*ft_strdup(const char *s);
 void	free_2d_string(char **s);
 void	free_2d_array(int **array, int num_lines);
 int		**malloc_2d_array(int **array, int size, int lines);
+void	copy_2d_str(char **srcs, char **dest, int start, t_data *data);
+char	**calloc_2d_str(int size, int lines);
 int		ft_isdigit(int c);
 int		ft_isalpha(int c);
 char	*ft_str_append(char *s, char c);
