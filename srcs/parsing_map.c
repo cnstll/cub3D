@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
-/*   Updated: 2021/03/16 17:00:35 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 11:52:01 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static int	check_n_w(char **map, int i, int j, int start)
 {
 	if (i - start == 0 && map[i][j] == ' ')
 	{
-		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
+		if (j != 0 && map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
 			return (-7);
 		if (map[i + 1][j] && !c_in_s(map[i + 1][j], " 1"))
 			return (-7);

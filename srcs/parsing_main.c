@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:39:58 by calle             #+#    #+#             */
-/*   Updated: 2021/03/16 17:23:06 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/17 12:31:50 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,29 +68,31 @@ static void	str_to_array(char **src, int **dest, t_data *data, int s)
 
 int			check_empty_lines(char **map, t_data *data)
 {
-	int j;
-	int i;
-	int	l1;
-	int	l2;
-	int	l3;
+	int		i;
+	int		l[3];
 
-	i = 0;
-	l1 = 0;
-	l2 = 0;
-	l3 = 0;
-	while (i < data->world_ht - 2)
+	i = -1;
+	l[0] = 0;
+	l[1] = 0;
+	l[2] = 0;
+	while (++i < data->world_ht - 2)
 	{
-		j = 0;
-		while (map[i][j] && j < data->world_wd)
+		if (l[0] == 1 && l[1] == 1 && l[2] == 1)
+			return (-7);
+		if (map[i][0] && (l[0] == 0 || l[2] == 1))
 		{
-			l1 = 1;
-			j++;
+			l[0] = 1;
+			l[2] = 0;
 		}
-		i++;
-		if (l1 == 1 && l2 == 0 && l3 == 1)
-			return (-7); 
+		else if (map[i][0] && l[0] == 1)
+			l[2] = 1;
+		if (!map[i][0])
+		{
+			l[1] = 1;
+			l[2] = 0;
+		}
 	}
-	return (1); 
+	return (1);
 }
 
 int			parsing_parameters(char **line, t_config *config)
@@ -118,8 +120,8 @@ int			parsing_parameters(char **line, t_config *config)
 
 int			parsing_map(char **map, t_data *data, int start)
 {
-	int	r;
-	char **tmp;
+	int		r;
+	char	**tmp;
 
 	r = 0;
 	r = map_pre_parsing(map, start);
@@ -129,9 +131,9 @@ int			parsing_map(char **map, t_data *data, int start)
 	data->world_ht = map_max_height(map, start);
 	tmp = calloc_2d_str(data->world_wd, data->world_ht);
 	copy_2d_str(map, tmp, start, data);
-	//r = check_empty_lines(tmp, data);
-	//if (r < 0)
-	//	return (r);
+	r = check_empty_lines(tmp, data);
+	if (r < 0)
+		return (r);
 	r = check_map_golden_rule(tmp, 0);
 	if (r < 0)
 		return (r);

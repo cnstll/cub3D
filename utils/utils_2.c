@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:55:56 by calle             #+#    #+#             */
-/*   Updated: 2021/03/16 12:45:05 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/17 11:28:55 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	copy_2d_str(char **srcs, char **dest, int start, t_data *data)
 	while (j < data->world_ht)
 	{
 		i = 0;
-		while (i < data->world_wd)
+		while (i < data->world_wd && srcs[start + j][i])
 		{
 			dest[j][i] = srcs[start + j][i];
 			i++;
