@@ -6,7 +6,7 @@
 /*   By: user42 <calle@student.42.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/15 10:21:59 by user42            #+#    #+#             */
-/*   Updated: 2021/03/15 10:25:24 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 16:41:01 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static void		write_pixels(int pitch, t_bimg *bimg, int fd)
 		j = 0;
 		while (j < bimg->w)
 		{
-			p = get_pixel(bimg, bimg->h - i, j);
+			p = get_pixel(bimg, bimg->h - i - 1, j);
 			bgr_pix[0] = p.b;
 			bgr_pix[1] = p.g;
 			bgr_pix[2] = p.r;

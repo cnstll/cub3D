@@ -25,7 +25,8 @@ SRCS = srcs/raycasting.c \
 		utils/utils_2.c \
 		utils/utils_3.c \
 		utils/utils_bmp.c \
-		utils/utils_parsing.c
+		utils/utils_parsing.c \
+		utils/utils_parsing2.c
 
 OBJS = $(SRCS:.c=.o)
 

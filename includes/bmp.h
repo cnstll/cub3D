@@ -1,31 +1,33 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bmp.h                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/17 17:16:22 by calle             #+#    #+#             */
+/*   Updated: 2021/03/17 17:20:01 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef _BMP_H
-#define _BMP_H
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+# define _BMP_H
 
-#pragma pack(push, 1)
-
-typedef int int32;
-
-typedef short int16;
+# pragma pack(push, 1)
 
 typedef struct	s_img_header
 {
-	int32 size_img_header;
-	int32 wd;
-	int32 ht;
-	int16 planes;
-	int16 bpp;
-	int32 compression;
-	int32 size_img;
-	int32 hres;
-	int32 vres;
-	int32 c_table;
-	int32 c_img_table;
+	int32_t size_img_header;
+	int32_t wd;
+	int32_t ht;
+	int16_t planes;
+	int16_t bpp;
+	int32_t compression;
+	int32_t size_img;
+	int32_t hres;
+	int32_t vres;
+	int32_t c_table;
+	int32_t c_img_table;
 }				t_img_header;
 
 typedef struct	s_head
@@ -36,7 +38,7 @@ typedef struct	s_head
 	int32			img_offset;
 	t_img_header	img_head;
 }				t_head;
-#pragma pack(pop)
+# pragma pack(pop)
 
 typedef struct	s_pixel
 {
@@ -45,18 +47,18 @@ typedef struct	s_pixel
 	unsigned char	b;
 }				t_pixel;
 
-typedef struct	s_bimg 
+typedef struct	s_bimg
 {
-	int		w;
-	int		h;
-	t_pixel	*dat;
+	int			w;
+	int			h;
+	t_pixel		*dat;
 }				t_bimg;
 
-int		copy_buffer_to_bimg(t_data *data, int **buf);
-t_bimg	*new_bmp_img(int w, int h);
-t_bimg	*cpy_bmp_img(t_bimg *bimg);
-void	del_bmp_img(t_bimg *bimg);
-int		set_pixel(t_bimg *bimg, int i, int j, t_pixel p);
-t_pixel	get_pixel(t_bimg *bimg, int i, int j);
+int				copy_buffer_to_bimg(t_data *data, int **buf);
+t_bimg			*new_bmp_img(int w, int h);
+t_bimg			*cpy_bmp_img(t_bimg *bimg);
+void			del_bmp_img(t_bimg *bimg);
+int				set_pixel(t_bimg *bimg, int i, int j, t_pixel p);
+t_pixel			get_pixel(t_bimg *bimg, int i, int j);
+unsigned long	rgb_to_hex(int r, int g, int b);
 #endif
- 

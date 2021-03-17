@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 17:04:48 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 11:47:39 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/17 17:10:30 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int				check_filepath(char *file_path)
 	i = 0;
 	while (file_path && file_path[i])
 		i++;
-	r = ft_strnstr(file_path, ".cub", i);
+	r = ft_strnstr((file_path + i - 4), ".cub", i);
 	if (!r)
 		return (-1);
 	else
@@ -68,12 +68,15 @@ char			*file_to_str(char *path_file)
 	char	*tmp;
 	int		r;
 
-	fd = 0;
 	fd = open(path_file, O_RDONLY);
 	r = READ_SIZE;
 	tmp = NULL;
-	if (fd < 0)
+	if (fd < 0 || check_filepath(path_file) < 0)
+	{
+		if (fd >= 0)
+			close(fd);
 		return (NULL);
+	}
 	while (r == READ_SIZE)
 	{
 		ft_bzero(buf, READ_SIZE);

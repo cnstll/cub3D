@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:55:56 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 11:28:55 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/17 17:05:05 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ void	free_2d_array(int **array, int num_lines)
 
 char	**calloc_2d_str(int size, int lines)
 {
-	int	i;
-	char **str;
+	int		i;
+	char	**str;
 
 	i = 0;
 	str = (char **)ft_calloc(lines + 1, sizeof(char *));

@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/20 15:39:27 by calle             #+#    #+#             */
-/*   Updated: 2021/01/14 18:00:46 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 17:12:13 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,3 @@ char				*ft_itoa(long int n)
 		str[i] = (nb % 10) + 48;
 	return (str);
 }
-/*
-#include <limits.h>
-#include <stdio.h>
-int main()
-{
-	printf("%s\n", ft_itoa(INT_MIN));
-	printf("%s\n", ft_itoa(-4));
-	return (1);
-}*/

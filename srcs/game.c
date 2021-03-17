@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:16:06 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 11:45:03 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/17 14:04:52 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,11 @@ int	extract_config_elements(t_data *data, char *file_path)
 	if (!file_path)
 		return (-8);
 	tmp = file_to_str(file_path);
-	if (!tmp || check_filepath(file_path) < 1)
+	if (!tmp)
+	{
+		printf("tmp no defined\n");
 		return (-8);
+	}
 	param = ft_lite_split(tmp, '\n');
 	free(tmp);
 	r = parsing_parameters(param, data->config);

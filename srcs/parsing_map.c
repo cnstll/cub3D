@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 11:52:01 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 16:57:42 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ static int	check_n_w(char **map, int i, int j, int start)
 	return (1);
 }
 
+static int	check_e(char **map, int i, int j)
+{
+	if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
+		return (-7);
+	if (map[i][j - 1] && !c_in_s(map[i][j - 1], " 1"))
+		return (-7);
+	if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
+		return (-7);
+}
+
 static int	check_borders(char **map, int i, int j, int start)
 {
 	if (!c_in_s(map[i][j], " 1") && map[i][j])
@@ -72,14 +82,7 @@ static int	check_borders(char **map, int i, int j, int start)
 			return (-7);
 	}
 	else if (!map[i][j + 1] && map[i][j] == ' ')
-	{
-		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
-			return (-7);
-		if (map[i][j - 1] && !c_in_s(map[i][j - 1], " 1"))
-			return (-7);
-		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
-			return (-7);
-	}
+		check_e(map, i, j);
 	else if (!map[i + 1][j] && map[i][j] == ' ')
 	{
 		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
@@ -90,21 +93,6 @@ static int	check_borders(char **map, int i, int j, int start)
 			return (-7);
 	}
 	return (1);
-}
-
-static int	is_border(char **map, int i, int j, int start)
-{
-	if (j == 0 || i - start == 0)
-		return (1);
-	else if (!map[i - 1][j - 1] || !map[i - 1][j] || !map[i - 1][j + 1])
-		return (1);
-	else if (!map[i + 1][j - 1] || !map[i + 1][j] || !map[i + 1][j + 1])
-		return (1);
-	else if (!map[i][j - 1] || !map[i - 1][j - 1] || !map[i + 1][j - 1])
-		return (1);
-	else if (!map[i][j + 1] || !map[i - 1][j + 1] || !map[i + 1][j + 1])
-		return (1);
-	return (-1);
 }
 
 int			check_map_golden_rule(char **map, int start)

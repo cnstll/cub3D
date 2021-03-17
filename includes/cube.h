@@ -1,5 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cube.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/17 17:13:28 by calle             #+#    #+#             */
+/*   Updated: 2021/03/17 17:21:16 by calle            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CUBE_H
-#define CUBE_H
+# define CUBE_H
 
 # include "./structures.h"
 # include "./bmp.h"
@@ -16,7 +28,7 @@
 # include "../mlx_linux/mlx.h"
 # include <X11/keysym.h>
 # include <X11/X.h>
-# define  READ_SIZE 64
+# define READ_SIZE 64
 
 void	handle_sprites(t_data *data, t_ray *ray, t_sprite *sprite);
 void	bubble_sort_with_order(double *array, int *order, int size);
@@ -44,7 +56,7 @@ void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s);
 void	calculate_wall_dist(t_ray *ray, t_data *data);
 void	diff_analysis(t_ray *ray, int **world);
 void	ray_step_and_side(t_ray *ray);
-void    ray_initiation(t_ray *ray, int stripes, int max_stripes);
+void	ray_initiation(t_ray *ray, int stripes, int max_stripes);
 int		clear_buffer(int **buffer, t_data *data);
 int		draw_buffer(int **buffer, t_data *data);
 int		init_inputs(t_data *data);
@@ -76,7 +88,6 @@ int		copy_res(char *p, t_config *config, int start);
 int		check_color(char *p, int start);
 int		copy_color(char *p, t_config *config, int start);
 void	parse_param_line(char *p, t_config *config);
-unsigned long	rgb_to_hex(int r, int g, int b);
 int		valid_elements_pair(char e1, char e2);
 int		check_path(char *p, int start);
 int		copy_path(char *p, t_config *config, int start);
@@ -93,5 +104,6 @@ int		check_map_golden_rule(char **map, int start);
 int		parsing_parameters(char **line, t_config *config);
 int		parsing_map(char **map, t_data *data, int start);
 int		check_filepath(char *file_path);
-
+int		is_border(char **map, int i, int j, int start);
+unsigned long	rgb_to_hex(int r, int g, int b);
 #endif
