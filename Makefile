@@ -43,18 +43,22 @@ LIB = -L./libft/ -lft
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-		$(MAKE) -C ./libft
+		@$(MAKE) -C ./libft
+		@$(MAKE) -C ./mlx_linux
 		$(CC) -o $(NAME) $(OBJS) $(MLX_REQ_LN) $(LIB)
 
 %.o : %.c
 		$(CC) ${CFLAGS} -I ${HEADERS} -Imlx_linux -o $@ -c $<
 
 clean :
-		$(MAKE) clean -C ./libft
+		@$(MAKE) clean -C ./libft
+		@$(MAKE) clean -C ./mlx_linux
 		rm -f $(OBJS)
 
-fclean : clean
-		 $(MAKE) fclean -C ./libft
-		 rm -f $(NAME)
+fclean :
+		@$(MAKE) fclean -C ./libft
+		@$(MAKE) clean -C ./mlx_linux
+		rm -f $(OBJS)
+		rm -f $(NAME)
 
 re : fclean all

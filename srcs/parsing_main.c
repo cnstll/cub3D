@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:39:58 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 12:31:50 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 19:28:48 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,12 +131,16 @@ int			parsing_map(char **map, t_data *data, int start)
 	data->world_ht = map_max_height(map, start);
 	tmp = calloc_2d_str(data->world_wd, data->world_ht);
 	copy_2d_str(map, tmp, start, data);
-	r = check_empty_lines(tmp, data);
-	if (r < 0)
+	if ((r = check_empty_lines(tmp, data)) < 0)
+	{
+		free_2d_string(tmp);
 		return (r);
-	r = check_map_golden_rule(tmp, 0);
-	if (r < 0)
+	}
+	if ((r = check_map_golden_rule(tmp, 0)) < 0)
+	{
+		free_2d_string(tmp);
 		return (r);
+	}
 	data->world = malloc_2d_array(data->world, data->world_wd, data->world_ht);
 	str_to_array(tmp, data->world, data, 0);
 	free_2d_string(tmp);

@@ -6,13 +6,13 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 17:16:22 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 17:20:01 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 18:21:43 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef _BMP_H
 # define _BMP_H
-
+# include <stdint.h>
 # pragma pack(push, 1)
 
 typedef struct	s_img_header
@@ -33,9 +33,9 @@ typedef struct	s_img_header
 typedef struct	s_head
 {
 	char			signature[2];
-	int32			size;
-	int32			reserved;
-	int32			img_offset;
+	int32_t			size;
+	int32_t			reserved;
+	int32_t			img_offset;
 	t_img_header	img_head;
 }				t_head;
 # pragma pack(pop)

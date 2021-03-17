@@ -6,13 +6,13 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:16:06 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 14:04:52 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 18:32:06 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cube.h"
 
-int	play(t_data *data)
+static int	play(t_data *data)
 {
 	int	r;
 
@@ -38,7 +38,7 @@ int	play(t_data *data)
 	return (r);
 }
 
-int	save(t_data *data)
+static int	save(t_data *data)
 {
 	int r;
 
@@ -57,7 +57,7 @@ int	save(t_data *data)
 	return (r);
 }
 
-int	extract_config_elements(t_data *data, char *file_path)
+static int	extract_config_elements(t_data *data, char *file_path)
 {
 	char	*tmp;
 	char	**param;
@@ -67,10 +67,7 @@ int	extract_config_elements(t_data *data, char *file_path)
 		return (-8);
 	tmp = file_to_str(file_path);
 	if (!tmp)
-	{
-		printf("tmp no defined\n");
 		return (-8);
-	}
 	param = ft_lite_split(tmp, '\n');
 	free(tmp);
 	r = parsing_parameters(param, data->config);
@@ -80,31 +77,31 @@ int	extract_config_elements(t_data *data, char *file_path)
 	return (r);
 }
 
-int	main(int argc, char *argv[])
+int			main(int argc, char *argv[])
 {
-	t_data	*data;
-	int		r;
+	t_data		*data;
+	static int	s_error = 0;
 
 	data = malloc(sizeof(t_data));
 	init_config(data);
 	if (argc == 2)
 	{
-		r = extract_config_elements(data, argv[1]);
-		if (r >= 0)
-			r = play(data);
+		s_error = extract_config_elements(data, argv[1]);
+		if (s_error >= 0)
+			s_error = play(data);
 	}
 	else if (argc == 3)
 	{
 		if ((data->save = ft_strncmp(argv[2], "--save", 7)) != 0)
-			r = -9;
-		if (r >= 0)
-			r = extract_config_elements(data, argv[1]);
-		if (r >= 0 && data->save == 0)
-			r = save(data);
+			s_error = -9;
+		if (s_error >= 0)
+			s_error = extract_config_elements(data, argv[1]);
+		if (s_error >= 0 && data->save == 0)
+			s_error = save(data);
 	}
 	else
-		r = -9;
-	error_handler(r);
+		s_error = -9;
+	error_handler(s_error);
 	destroy_config(data, data->config);
 	return (1);
 }

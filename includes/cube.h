@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 17:13:28 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 17:21:16 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 18:31:42 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,15 @@ void	bubble_sort_with_order(double *array, int *order, int size);
 void	bubble_sort(t_sprite *sprite, double *array, int size);
 char	*ft_strdup_till_char(char *s, char c, int start);
 int		c_in_s(char c, char *s);
-void	ft_bzero(void *s, size_t n);
 char	*ft_strjoin_free(char *s1, char *s2);
-size_t	ft_strlen(const char *s);
-char	*ft_strdup(const char *s);
 void	free_2d_string(char **s);
 void	free_2d_array(int **array, int num_lines);
 int		**malloc_2d_array(int **array, int size, int lines);
 void	copy_2d_str(char **srcs, char **dest, int start, t_data *data);
 char	**calloc_2d_str(int size, int lines);
-int		ft_isdigit(int c);
-int		ft_isalpha(int c);
 char	*ft_str_append(char *s, char c);
 int		ft_lite_atoi(const char *s);
 char	**ft_lite_split(char *s, char c);
-int		ft_strncmp(const char *s1, const char *s2, size_t n);
-int		play(t_data *data);
-int		save(t_data *data);
 void	calculate_textures(t_data *data, t_ray *ray, t_img **textures, int s);
 void	calculate_wall_dist(t_ray *ray, t_data *data);
 void	diff_analysis(t_ray *ray, int **world);
@@ -99,11 +91,9 @@ void	init_player_dir(t_config *config, double rot);
 void	init_config(t_data *data);
 void	destroy_config(t_data *data, t_config *config);
 void	error_handler(int error);
-int		extract_config_elements(t_data *data, char *file_path);
 int		check_map_golden_rule(char **map, int start);
 int		parsing_parameters(char **line, t_config *config);
 int		parsing_map(char **map, t_data *data, int start);
 int		check_filepath(char *file_path);
 int		is_border(char **map, int i, int j, int start);
-unsigned long	rgb_to_hex(int r, int g, int b);
 #endif

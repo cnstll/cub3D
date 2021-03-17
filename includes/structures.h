@@ -6,14 +6,15 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 17:14:30 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 17:14:33 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 18:19:26 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STRUCTURES_H
-#define STRUCTURES_H
+# define STRUCTURES_H
 
-typedef struct s_config {
+typedef struct	s_config
+{
 	int				res_x;
 	int				res_y;
 	char			*tx_no;
@@ -34,19 +35,20 @@ typedef struct s_config {
 	double			init_pos_y;
 }				t_config;
 
-typedef struct	s_img {
+typedef struct	s_img
+{
 	char		*file_paths;
-	void        *img;
+	void		*img;
 	int			*addr;
-	int         bpp;
-	int         line_len;
-	int         endian;
+	int			bpp;
+	int			line_len;
+	int			endian;
 	int			width;
 	int			height;
 }				t_img;
 
-typedef struct s_ray {
-
+typedef struct	s_ray
+{
 	double		pos_x;
 	double		pos_y;
 	double		dir_x;
@@ -79,8 +81,8 @@ typedef struct s_ray {
 	double		tx_pos;
 }				t_ray;
 
-typedef struct	s_input {
-
+typedef struct	s_input
+{
 	int			key_w;
 	int			key_s;
 	int			key_a;
@@ -90,13 +92,15 @@ typedef struct	s_input {
 	int			key_esc;
 }				t_input;
 
-typedef struct	s_sp {
+typedef struct	s_sp
+{
 	double		x;
 	double		y;
 	int			tx_num;
 }				t_sp;
 
-typedef struct	s_sprite {
+typedef struct	s_sprite
+{
 	int			num;
 	double		*buffer;
 	int			*order;
@@ -118,7 +122,8 @@ typedef struct	s_sprite {
 	t_sp		*sp;
 }				t_sprite;
 
-typedef struct  s_data {
+typedef struct	s_data
+{
 	void		*mlx;
 	void		*win;
 	int			screen_ht;
@@ -134,6 +139,6 @@ typedef struct  s_data {
 	t_input		*inputs;
 	t_sprite	*sprite;
 	t_config	*config;
-}               t_data;
+}				t_data;
 
 #endif

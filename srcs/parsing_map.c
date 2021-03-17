@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 16:57:42 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/17 22:13:50 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,25 @@ static int	check_n_w(char **map, int i, int j, int start)
 
 static int	check_e(char **map, int i, int j)
 {
-	if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
-		return (-7);
-	if (map[i][j - 1] && !c_in_s(map[i][j - 1], " 1"))
-		return (-7);
-	if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
-		return (-7);
+	if (!map[i][j + 1] && map[i][j] == ' ')
+	{
+		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
+			return (-7);
+		if (map[i][j - 1] && !c_in_s(map[i][j - 1], " 1"))
+			return (-7);
+		if (map[i + 1][j - 1] && !c_in_s(map[i + 1][j - 1], " 1"))
+			return (-7);
+	}
+	else if (!map[i + 1][j] && map[i][j] == ' ')
+	{
+		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
+			return (-7);
+		if (map[i - 1][j] && !c_in_s(map[i - 1][j], " 1"))
+			return (-7);
+		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
+			return (-7);
+	}
+	return (1);
 }
 
 static int	check_borders(char **map, int i, int j, int start)
@@ -82,16 +95,11 @@ static int	check_borders(char **map, int i, int j, int start)
 			return (-7);
 	}
 	else if (!map[i][j + 1] && map[i][j] == ' ')
-		check_e(map, i, j);
+		return (check_e(map, i, j));
 	else if (!map[i + 1][j] && map[i][j] == ' ')
-	{
-		if (map[i - 1][j - 1] && !c_in_s(map[i - 1][j - 1], " 1"))
-			return (-7);
-		if (map[i - 1][j] && !c_in_s(map[i - 1][j], " 1"))
-			return (-7);
-		if (map[i - 1][j + 1] && !c_in_s(map[i - 1][j + 1], " 1"))
-			return (-7);
-	}
+		return (check_e(map, i, j));
+	else
+		return (apply_golden_rule(map, i, j));
 	return (1);
 }
 
@@ -110,7 +118,7 @@ int			check_map_golden_rule(char **map, int start)
 		{
 			if (is_border(map, i, j, start) < 0 && map[i][j] == ' ')
 				r = apply_golden_rule(map, i, j);
-			else if (is_border(map, i, j, start) > 0)
+			else if (is_border(map, i, j, start) > 0 && map[i][j] == ' ')
 				r = check_borders(map, i, j, start);
 			j++;
 		}
