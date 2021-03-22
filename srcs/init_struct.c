@@ -6,30 +6,29 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:24:05 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 16:25:37 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/21 18:19:03 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/cube.h"
 
-int		init_buffer(t_data *data)
+int		init_buffer(t_data *data, t_config *config)
 {
-	int size_x;
-	int size_y;
-
-	size_x = 0;
-	size_y = 0;
 	data->mlx = mlx_init();
 	if (data->mlx == NULL)
 		return (-1);
-	data->screen_ht = data->config->res_y;
-	data->screen_wd = data->config->res_x;
-	mlx_get_screen_size(data->mlx, &size_x, &size_y);
-	if (!data->save && (data->screen_wd > size_x || data->screen_ht > size_y))
-	{
-		data->screen_wd = size_x;
-		data->screen_ht = size_y;
-	}
+	data->screen_wd = config->res_x;
+	data->screen_ht = config->res_y;
+	if (data->save == 0 && config->res_x > config->res_x_max)
+		data->screen_wd = config->res_x_max;
+	if (data->save == 0 && config->res_y > config->res_y_max)
+		data->screen_ht = config->res_y_max;
+	if (data->save != 0)
+		mlx_get_screen_size(data->mlx, &config->res_x_max, &config->res_y_max);
+	if (data->save != 0 && config->res_x > config->res_x_max)
+		data->screen_wd = config->res_x_max;
+	if (data->save != 0 && config->res_y > config->res_y_max)
+		data->screen_ht = config->res_y_max;
 	data->buffer = NULL;
 	data->buffer =
 		malloc_2d_array(data->buffer, data->screen_wd, data->screen_ht);

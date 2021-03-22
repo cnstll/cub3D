@@ -6,7 +6,7 @@
 /*   By: user42 <calle@student.42.fr>               +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/15 10:21:59 by user42            #+#    #+#             */
-/*   Updated: 2021/03/17 16:41:01 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 18:37:09 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,24 +42,24 @@ static void		write_pixels(int pitch, t_bimg *bimg, int fd)
 	unsigned char	bgr_pix[3];
 	t_pixel			p;
 
-	i = 0;
-	while (i < bimg->h)
+	j = 0;
+	while (j < bimg->h)
 	{
-		j = 0;
-		while (j < bimg->w)
+		i = 0;
+		while (i < bimg->w)
 		{
-			p = get_pixel(bimg, bimg->h - i - 1, j);
+			p = get_pixel(bimg, i, bimg->h - j - 1);
 			bgr_pix[0] = p.b;
 			bgr_pix[1] = p.g;
 			bgr_pix[2] = p.r;
 			write(fd, &bgr_pix, 3);
-			j++;
+			i++;
 		}
 		bgr_pix[0] = 0;
 		bgr_pix[1] = 0;
 		bgr_pix[2] = 0;
 		write(fd, &bgr_pix, pitch);
-		i++;
+		j++;
 	}
 }
 
@@ -94,20 +94,20 @@ int				copy_buffer_to_bimg(t_data *data, int **buf)
 	t_bimg	*bimg;
 	t_pixel	p;
 
-	i = 0;
+	j = 0;
 	bimg = new_bmp_img(data->screen_wd, data->screen_ht);
-	while (i < data->screen_ht)
+	while (j < data->screen_ht)
 	{
-		j = 0;
-		while (j < data->screen_wd)
+		i = 0;
+		while (i < data->screen_wd)
 		{
-			p.r = hexa_to_rgb(buf[i][j], 'R');
-			p.g = hexa_to_rgb(buf[i][j], 'G');
-			p.b = hexa_to_rgb(buf[i][j], 'B');
+			p.r = hexa_to_rgb(buf[j][i], 'R');
+			p.g = hexa_to_rgb(buf[j][i], 'G');
+			p.b = hexa_to_rgb(buf[j][i], 'B');
 			set_pixel(bimg, i, j, p);
-			j++;
+			i++;
 		}
-		i++;
+		j++;
 	}
 	save_img(bimg, "save.bmp");
 	del_bmp_img(bimg);

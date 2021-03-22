@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:20:17 by calle             #+#    #+#             */
-/*   Updated: 2021/03/14 15:22:32 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 17:30:42 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,11 @@ void	init_player(char dir, int x, int y, t_config *config)
 void	init_config(t_data *data)
 {
 	data->config = malloc(sizeof(t_config));
-	data->save = 0;
+	data->save = -1;
 	data->config->res_x = 0;
 	data->config->res_y = 0;
+	data->config->res_x_max = 10000;
+	data->config->res_y_max = 10000;
 	data->config->tx_no = "";
 	data->config->tx_so = "";
 	data->config->tx_ea = "";

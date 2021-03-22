@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 15:16:06 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 18:32:06 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 16:52:18 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static int	play(t_data *data)
 	int	r;
 
 	r = 1;
-	init_buffer(data);
+	init_buffer(data, data->config);
 	init_mlx_window(data);
 	init_img(data);
 	init_ray(data);
@@ -43,7 +43,7 @@ static int	save(t_data *data)
 	int r;
 
 	r = 1;
-	init_buffer(data);
+	init_buffer(data, data->config);
 	init_ray(data);
 	if (init_textures(data) == -1)
 		r = -10;

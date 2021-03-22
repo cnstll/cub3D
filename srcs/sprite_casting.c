@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/23 22:37:17 by calle             #+#    #+#             */
-/*   Updated: 2021/02/23 22:56:39 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/22 10:27:46 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ static void	put_sprite_stripes(t_data *data, t_sprite *sprite, int stripe)
 			((d * data->textures[4]->height) / sprite->height) / 256;
 		if (sprite->tx_y < 0)
 			sprite->tx_y = fabs(sprite->tx_y);
+		if (sprite->tx_x < 0)
+			sprite->tx_x = fabs(sprite->tx_x);
 		color =
 			data->textures[4]->addr[data->textures[4]->width
 			* sprite->tx_y + sprite->tx_x];

@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/14 16:42:59 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 22:13:50 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 19:07:46 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ static int	check_borders(char **map, int i, int j, int start)
 {
 	if (!c_in_s(map[i][j], " 1") && map[i][j])
 		return (-7);
+	if (map[i][j] == '1')
+		return (1);
 	if ((j == 0 || i - start == 0))
 		return (check_n_w(map, i, j, start));
 	else if (!map[i - 1][j] && map[i][j] == ' ')
@@ -118,7 +120,7 @@ int			check_map_golden_rule(char **map, int start)
 		{
 			if (is_border(map, i, j, start) < 0 && map[i][j] == ' ')
 				r = apply_golden_rule(map, i, j);
-			else if (is_border(map, i, j, start) > 0 && map[i][j] == ' ')
+			else if (is_border(map, i, j, start) > 0)
 				r = check_borders(map, i, j, start);
 			j++;
 		}

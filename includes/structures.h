@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 17:14:30 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 18:19:26 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 16:44:45 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ typedef struct	s_config
 {
 	int				res_x;
 	int				res_y;
+	int				res_x_max;
+	int				res_y_max;
 	char			*tx_no;
 	char			*tx_so;
 	char			*tx_ea;

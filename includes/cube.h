@@ -6,7 +6,7 @@
 /*   By: calle <calle@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 17:13:28 by calle             #+#    #+#             */
-/*   Updated: 2021/03/17 18:31:42 by calle            ###   ########.fr       */
+/*   Updated: 2021/03/21 16:51:41 by calle            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int		init_map(t_data *data);
 int		init_textures(t_data *data);
 int		init_ray(t_data *data);
 int		init_img(t_data *data);
-int		init_buffer(t_data *data);
+int		init_buffer(t_data *data, t_config *config);
 int		init_mlx_window(t_data *data);
 void	free_and_destroy_save(t_data *data);
 void	free_and_destroy_play(t_data *data);
